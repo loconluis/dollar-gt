@@ -58,7 +58,7 @@ export const getDollarValueByBinaceP2PType = async ({
     const returnData: IDataResponse = {
       platform: "Binance",
       dollarValue: data?.data[0]?.adv?.price,
-      info: "Binance es una exchange de Cryptomonedas donde puedes comprar en muchas formas una de ellas es P2P",
+      info: '<a href="https://p2p.binance.com/" target="_blank">Binance</a> es una exchange de Criptomonedas donde puedes comprar en muchas formas una de ellas es P2P',
       currencyFiat: data?.data[0]?.adv?.fiatSymbol,
       operation,
     };
@@ -80,7 +80,9 @@ export const getBitcoinValue = async () => {
     platform: "Coindesk",
     USDPrice: data.bpi.USD.rate,
     GTQPrice: data.bpi.GTQ.rate,
-    info: data.disclaimer,
+    info:
+      data.disclaimer +
+      '\n Ver <a href="https://www.coindesk.com/" target="_blank">Coindesk</a>',
   };
   return obj;
 };
