@@ -115,6 +115,9 @@ export function CurrencyExchangeRatesComponent() {
                 </p>
               </div>
             </div>
+            <p className="text-sm text-gray-400 text-center mt-4">
+              Consulta: {new Date().toLocaleString()}
+            </p>
             <p
               className="text-sm text-gray-400 text-center mt-4"
               dangerouslySetInnerHTML={{ __html: binanceBuy.info }}
@@ -161,12 +164,12 @@ export function CurrencyExchangeRatesComponent() {
             <Button
               size="icon"
               variant="outline"
-              onClick={() => console.log("Refresh clicked")}
+              onClick={handleRefresh}
               className="bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600"
               disabled={loading}
             >
-              <RefreshCcw onClick={handleRefresh} className="h-4 w-4" />
-              <span className="sr-only">Refresh rates</span>
+              <RefreshCcw className="h-4 w-4" />
+              <span className="sr-only">Refrescar datos</span>
             </Button>
             {/* <Button
               size="icon"
@@ -187,7 +190,7 @@ export function CurrencyExchangeRatesComponent() {
                 className="bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600"
               >
                 <Info className="h-4 w-4" />
-                <span className="sr-only">Share rates</span>
+                <span className="sr-only">Informacion</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-gray-800 text-gray-100 border-gray-700">
