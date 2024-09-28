@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,20 +13,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import {
-  RefreshCcw,
-  Share2,
-  Info,
-  Copy,
-  Twitter,
-  Facebook,
-} from "lucide-react";
+import { RefreshCcw, Info } from "lucide-react";
 import { useFetchData } from "@/lib/useFetch";
 import Link from "next/link";
 
 export function CurrencyExchangeRatesComponent() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
   const { data, loading, handleRefresh } = useFetchData();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
@@ -35,14 +26,7 @@ export function CurrencyExchangeRatesComponent() {
 
   useEffect(() => {
     setMounted(true);
-    setTheme("dark");
   }, []);
-
-  const handleTheme = () => {
-    console.log("se presiona?");
-    console.log(theme);
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
 
   if (!mounted) {
     return null;
