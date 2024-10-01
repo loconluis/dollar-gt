@@ -1,9 +1,10 @@
 // import * as cheerio from "cheerio";
-import { handler } from "@/app/api/exchange/handler";
+import { call } from "@/lib/functions";
+export const revalidate = 60;
 
 export async function GET() {
   try {
-    const res = await handler();
+    const res = await call();
     return Response.json({ data: res });
   } catch (error) {
     throw error;

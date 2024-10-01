@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { RefreshCcw, Info } from "lucide-react";
-import { useFetchData } from "@/lib/useFetch";
+import { useFetchData } from "@/hooks/useFetch";
 import Link from "next/link";
 
 export function CurrencyExchangeRatesComponent() {
