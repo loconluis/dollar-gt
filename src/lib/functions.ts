@@ -1,6 +1,11 @@
 import axios from "axios";
 import { IBinanceP2PReq, IDataResponse } from "@/interfaces";
 import { convertXML } from "simple-xml-to-json";
+import {
+  parseDataForLegibleIn30DayRange,
+  substract30DaysFromDate,
+} from "./utils";
+import { constant } from "@/constants";
 
 const getDollarValueBancoGuate = async (): Promise<IDataResponse> => {
   try {
@@ -97,4 +102,42 @@ export const call = async () => {
     getBitcoinValue(),
   ]);
   return res;
+};
+
+export const getLast30DaysOfDolarValueOfficialRecords = async (
+  date: string
+) => {
+  try {
+    const pastDay = substract30DaysFromDate(date);
+    const uri = `${constant.BANC_GT_URI}${constant.BANC_GT_TIPO_CAMBIO}`;
+    const soapReq = `
+        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+          <soap:Body>
+            <TipoCambioFechaInicial xmlns="http://www.banguat.gob.gt/variables/ws/">
+              <fechainit>${pastDay}</fechainit>
+            </TipoCambioFechaInicial>
+          </soap:Body>
+        </soap:Envelope>
+        `;
+
+    const headers = {
+      "Content-Type": "text/xml",
+    };
+    const { data } = await axios.post(uri, soapReq, {
+      headers,
+    });
+
+    const reduceXML = /<Vars>(.*?)<\/Vars>/g.exec(data) || [""];
+    const xml2JSON = convertXML(reduceXML[0]);
+    if (!xml2JSON.length) {
+      const pivot = xml2JSON.Vars.children;
+      const formattedPivot = parseDataForLegibleIn30DayRange(pivot);
+      console.info(JSON.stringify(formattedPivot));
+      return formattedPivot;
+    }
+
+    throw new Error("No data fetch");
+  } catch (e) {
+    throw new Error("Unable to retrieve data from Banco de Guatemala " + e);
+  }
 };
