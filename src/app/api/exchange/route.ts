@@ -1,11 +1,11 @@
-// import * as cheerio from "cheerio";
-import { call } from "@/lib/functions";
+// // import * as cheerio from "cheerio";
 export const revalidate = 60;
 
 export async function GET() {
   try {
-    const res = await call();
-    return Response.json({ data: res });
+    return Response.json({
+      data: "Someday here will you can find something here",
+    });
   } catch (error) {
     throw error;
   }
