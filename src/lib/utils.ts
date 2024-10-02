@@ -18,7 +18,7 @@ export const substract30DaysFromDate = (date: string) => {
     parseInt(month) - 1,
     parseInt(day)
   );
-  const pastDate = sub(parseDate, { days: 30 });
+  const pastDate = sub(parseDate, { days: 29 });
   return `${
     pastDate.getDate() < 10 ? "0" + pastDate.getDate() : pastDate.getDate()
   }/${
@@ -31,6 +31,8 @@ export const substract30DaysFromDate = (date: string) => {
 export const parseDataForLegibleIn30DayRange = (
   data: ResponseData30DayRangeBancoGuatemala[]
 ) => {
+  getToday();
+
   const formattedData: FormattedHistoricObject[] = [];
   data.forEach((el) => {
     formattedData.push({
@@ -40,4 +42,8 @@ export const parseDataForLegibleIn30DayRange = (
   });
 
   return formattedData;
+};
+
+export const getToday = () => {
+  return new Intl.DateTimeFormat("es-GT").format(new Date());
 };

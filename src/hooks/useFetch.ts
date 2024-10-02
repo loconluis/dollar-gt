@@ -54,3 +54,21 @@ export const useFetchData = () => {
 
   return { data, loading, handleRefresh };
 };
+
+export const use30DaysData = (date: string) => {
+  const [data, setData] = useState([{ fecha: "", precio: "" }]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const call = async () => {
+      const res = await fetch(`/api/historic?date=${date}`);
+      const _data = await res.json();
+      setData(() => [..._data?.data]);
+      setLoading(false);
+    };
+    setLoading(true);
+    call();
+  }, [date]);
+
+  return { data, loading };
+};

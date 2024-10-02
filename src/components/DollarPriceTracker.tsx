@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -30,51 +30,28 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-const generateDummyData = (days: number) => {
-  const data = [];
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - days + 1);
-
-  for (let i = 0; i < days; i++) {
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + i);
-    data.push({
-      date: date.toISOString().split("T")[0],
-      price: (7.5 + Math.random() * 0.5).toFixed(4),
-    });
-  }
-  return data;
-};
+import { use30DaysData } from "@/hooks/useFetch";
+import { getToday } from "@/lib/utils";
+import { FormattedHistoricObject } from "@/interfaces";
 
 export function DollarPriceTracker() {
-  const [fourteenDayData, setFourteenDayData] = useState([]);
-  const [thirtyDayData, setThirtyDayData] = useState([]);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [gtqAmount, setGtqAmount] = useState("");
   const [usdAmount, setUsdAmount] = useState("");
+  const { data, loading } = use30DaysData(getToday());
 
-  useEffect(() => {
-    setFourteenDayData(generateDummyData(14));
-    setThirtyDayData(generateDummyData(30));
-    setIsLoaded(true);
-  }, []);
-
-  const calculateStats = (data) => {
-    const prices = data.map((d) => parseFloat(d.price));
+  const calculateStats = (data: FormattedHistoricObject[]) => {
+    const prices = data.map((d) => parseFloat(d.precio));
     return {
-      max: Math.max(...prices).toFixed(4),
-      min: Math.min(...prices).toFixed(4),
-      avg: (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(4),
+      max: Math.max(...prices).toFixed(5),
+      min: Math.min(...prices).toFixed(5),
+      avg: (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(5),
     };
   };
 
-  const thirtyDayStats = calculateStats(thirtyDayData);
-  const currentPrice = parseFloat(
-    fourteenDayData[fourteenDayData.length - 1]?.price
-  );
-  const startPrice = parseFloat(thirtyDayData[0]?.price);
-  const priceChange = (currentPrice - startPrice).toFixed(4);
+  const thirtyDayStats = calculateStats(data);
+  const currentPrice = parseFloat(data[data.length - 1]?.precio);
+  const startPrice = parseFloat(data[0]?.precio);
+  const priceChange = (currentPrice - startPrice).toFixed(5);
   const percentageChange = (
     ((currentPrice - startPrice) / startPrice) *
     100
@@ -83,20 +60,20 @@ export function DollarPriceTracker() {
   const handleGtqChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setGtqAmount(value);
-    setUsdAmount(value ? (parseFloat(value) / currentPrice).toFixed(2) : "");
+    setUsdAmount(value ? (parseFloat(value) / currentPrice).toFixed(5) : "");
   };
 
   const handleUsdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUsdAmount(value);
-    setGtqAmount(value ? (parseFloat(value) * currentPrice).toFixed(2) : "");
+    setGtqAmount(value ? (parseFloat(value) * currentPrice).toFixed(5) : "");
   };
 
   return (
     <div className="min-h-screen bg-black text-gray-300 p-8">
       <nav className="fixed top-0 left-0 right-0 bg-gray-900 p-4 z-10 border-b border-gray-800">
         <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-white">Dolar en Guatemala</h1>
+          <h1 className="text-2xl font-bold text-white">Dólar en Guatemala</h1>
           <div className="flex space-x-4">
             <Dialog>
               <DialogTrigger>
@@ -104,13 +81,23 @@ export function DollarPriceTracker() {
               </DialogTrigger>
               <DialogContent className="bg-gray-900 text-gray-300 border border-gray-800">
                 <DialogHeader>
-                  <DialogTitle className="text-white">Disclaimer</DialogTitle>
+                  <DialogTitle className="text-white">
+                    Descargo de responsabilidad
+                  </DialogTitle>
                 </DialogHeader>
                 <p>
-                  This application uses simulated data for demonstration
-                  purposes. In a real-world scenario, it would fetch live data
-                  from a reliable financial API. The information presented here
-                  should not be used for actual financial decisions.
+                  La aplicación proporciona información sobre el historial del
+                  tipo de cambio del dólar en Guatemala durante los últimos 30
+                  días. Los datos son proporcionados por el Banco Central de
+                  Guatemala. Aunque nos esforzamos por ofrecer información
+                  precisa y actualizada, no garantizamos la exactitud,
+                  integridad o actualidad de la información presentada. Los
+                  tipos de cambio pueden variar y dependen de múltiples
+                  factores. Esta aplicación no debe considerarse como asesoría
+                  financiera. Te recomendamos consultar a un profesional antes
+                  de tomar decisiones financieras basadas en la información aquí
+                  presentada. El uso de esta aplicación implica la aceptación de
+                  estos términos.
                 </p>
               </DialogContent>
             </Dialog>
@@ -121,17 +108,17 @@ export function DollarPriceTracker() {
               <DialogContent className="bg-gray-900 text-gray-300 border border-gray-800">
                 <DialogHeader>
                   <DialogTitle className="text-white">
-                    Author Information
+                    Información del autor
                   </DialogTitle>
                 </DialogHeader>
-                <p>Created by: Luis Locon</p>
+                <p>Creador por: Luis Locon</p>
                 <p>
                   Contact:{" "}
                   <a href="https://x.com/loconluis" target="_blank">
                     @LoconLuis
                   </a>
                 </p>
-                <p>GitHub: github.com/dollargt</p>
+                <p>GitHub: github.com/dollar-gt</p>
               </DialogContent>
             </Dialog>
           </div>
@@ -140,10 +127,10 @@ export function DollarPriceTracker() {
 
       <main className="mt-20 md:mx-40">
         <h2 className="text-3xl font-bold mb-8 text-center text-white">
-          Precio del Dolar en Guatemala
+          Precio del dólar (USD) en Guatemala
         </h2>
         <AnimatePresence>
-          {isLoaded && (
+          {!loading && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -153,7 +140,7 @@ export function DollarPriceTracker() {
             >
               <Card className="bg-gray-900 shadow-lg border border-gray-800">
                 <CardHeader>
-                  <CardTitle className="text-gray-400">Precio Actual</CardTitle>
+                  <CardTitle className="text-gray-400">Precio actual</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <motion.p
@@ -162,14 +149,14 @@ export function DollarPriceTracker() {
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
                   >
-                    {currentPrice.toFixed(4)} GTQ
+                    {currentPrice.toFixed(5)} GTQ
                   </motion.p>
                 </CardContent>
               </Card>
               <Card className="bg-gray-900 shadow-lg border border-gray-800">
                 <CardHeader>
                   <CardTitle className="text-gray-400">
-                    Cambio en los ultimos 30 Dias
+                    Cambio en los últimos 30 días
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -200,7 +187,7 @@ export function DollarPriceTracker() {
               <Card className="bg-gray-900 shadow-lg border border-gray-800">
                 <CardHeader>
                   <CardTitle className="text-gray-400">
-                    Información del portal del
+                    Información del portal
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -212,12 +199,16 @@ export function DollarPriceTracker() {
                   >
                     <p className="text-2xl font-bold">Banco de Guatemala</p>
                   </motion.div>
+                  <div className="text-slate-400">
+                    <small>
+                      Datos consultados: {new Date().toLocaleDateString()}
+                    </small>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
           )}
         </AnimatePresence>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -226,16 +217,20 @@ export function DollarPriceTracker() {
           <Card className="bg-gray-900 shadow-lg border border-gray-800 mb-8">
             <CardHeader>
               <CardTitle className="text-gray-400">
-                Tendencia del Precio (Ultimos 30 días)
+                Tendencia del precio (últimos 30 días)
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={fourteenDayData}>
+                  <LineChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" />
-                    <XAxis dataKey="date" stroke="#4a5568" hide />
-                    <YAxis domain={["auto", "auto"]} stroke="#4a5568" />
+                    <XAxis dataKey="fecha" stroke="#4a5568" hide />
+                    <YAxis
+                      dataKey="precio"
+                      domain={["auto", "auto"]}
+                      stroke="#4a5568"
+                    />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: "#1a1a1a",
@@ -247,7 +242,7 @@ export function DollarPriceTracker() {
                     />
                     <Line
                       type="monotone"
-                      dataKey="price"
+                      dataKey="precio"
                       stroke="#0057ff"
                       strokeWidth={3}
                       dot={true}
@@ -258,7 +253,6 @@ export function DollarPriceTracker() {
             </CardContent>
           </Card>
         </motion.div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -268,7 +262,7 @@ export function DollarPriceTracker() {
           <Card className="bg-gray-900 shadow-lg border border-gray-800">
             <CardHeader>
               <CardTitle className="text-gray-400">
-                Estadisticas del precio en los ultimos 30 dias
+                Estadísticas del precio en los últimos 30 días
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -284,15 +278,15 @@ export function DollarPriceTracker() {
                 <TableBody>
                   <TableRow>
                     <TableCell className="text-gray-300">
-                      Precio Maximo
+                      Precio máximo
                     </TableCell>
-                    <TableCell className="text-red-400">
+                    <TableCell className="text-blue-400">
                       {thirtyDayStats.max}
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="text-gray-300">
-                      Precio Promedio
+                      Precio promedio
                     </TableCell>
                     <TableCell className="text-yellow-400">
                       {thirtyDayStats.avg}
@@ -300,9 +294,9 @@ export function DollarPriceTracker() {
                   </TableRow>
                   <TableRow>
                     <TableCell className="text-gray-300">
-                      Precio Minimo
+                      Precio mínimo
                     </TableCell>
-                    <TableCell className="text-blue-400">
+                    <TableCell className="text-green-400">
                       {thirtyDayStats.min}
                     </TableCell>
                   </TableRow>
@@ -331,27 +325,27 @@ export function DollarPriceTracker() {
               >
                 <div>
                   <Label htmlFor="gtq-input" className="text-gray-400">
-                    GTQ Amount
+                    Monto en GTQ
                   </Label>
                   <Input
                     id="gtq-input"
                     type="number"
                     value={gtqAmount}
                     onChange={handleGtqChange}
-                    placeholder="Enter GTQ amount"
+                    placeholder="Agrega el monto en GTQ"
                     className="bg-gray-800 text-white border-gray-700"
                   />
                 </div>
                 <div>
                   <Label htmlFor="usd-input" className="text-gray-400">
-                    USD Amount
+                    Monto en USD
                   </Label>
                   <Input
                     id="usd-input"
                     type="number"
                     value={usdAmount}
                     onChange={handleUsdChange}
-                    placeholder="Enter USD amount"
+                    placeholder="Agrega el monto en USD"
                     className="bg-gray-800 text-white border-gray-700"
                   />
                 </div>
@@ -359,6 +353,58 @@ export function DollarPriceTracker() {
             </CardContent>
           </Card>
         </motion.div>
+        {false && (
+          <>
+            <h3 className="text-2xl font-bold my-8 text-white">
+              Dolar en Digital
+            </h3>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1, duration: 0.5 }}
+            >
+              <Card className="bg-gray-900 shadow-lg border border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-gray-400">
+                    Precio de monedas estables o stablecoins (USDT, USDC, DAI)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-gray-400">
+                          Plataforma
+                        </TableHead>
+                        <TableHead className="text-gray-400">
+                          Compra (GTQ)
+                        </TableHead>
+                        <TableHead className="text-gray-400">
+                          Venta (GTQ)
+                        </TableHead>
+                        <TableHead className="text-gray-400">Ver</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="text-gray-300">
+                          Binance P2P
+                        </TableCell>
+                        <TableCell className="text-blue-400">
+                          {thirtyDayStats.max}
+                        </TableCell>
+                        <TableCell className="text-blue-400">
+                          {thirtyDayStats.max}
+                        </TableCell>
+                        <TableCell className="text-blue-400">Link</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </>
+        )}
       </main>
     </div>
   );

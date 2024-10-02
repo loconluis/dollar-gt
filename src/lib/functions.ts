@@ -7,41 +7,6 @@ import {
 } from "./utils";
 import { constant } from "@/constants";
 
-const getDollarValueBancoGuate = async (): Promise<IDataResponse> => {
-  try {
-    const soap = "https://banguat.gob.gt/variables/ws/TipoCambio.asmx";
-    const soapRequest = `
-        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-            <soap:Body>
-                <TipoCambioDia xmlns="http://www.banguat.gob.gt/variables/ws/" />
-            </soap:Body>
-        </soap:Envelope>
-    `;
-    const headers = {
-      "Content-Type": "text/xml",
-      SOAPAction: '"http://www.banguat.gob.gt/variables/ws/TipoCambioDia"',
-    };
-    const { data } = await axios.post(soap, soapRequest, {
-      headers,
-    });
-
-    const reduceXML = /<referencia>(.*?)<\/referencia>/g.exec(data) || [""];
-    const xml2JSON = convertXML(reduceXML[0]);
-    if (!xml2JSON.length) {
-      console.log("BNGT VD: ", xml2JSON.referencia.content);
-      return {
-        platform: "Banco de Guatemala",
-        dollarValue: xml2JSON.referencia.content,
-        info: "Este es el valor oficial del Banco de Guatemala",
-      };
-    }
-
-    throw new Error("No data fetch");
-  } catch (error) {
-    throw new Error("Unable to retrieve data from Banco de Guatemala " + error);
-  }
-};
-
 export const getDollarValueByBinaceP2PType = async ({
   asset = "USDT",
   operation = "BUY",
@@ -75,7 +40,13 @@ export const getDollarValueByBinaceP2PType = async ({
   }
 };
 
-export const getDollarByOsmoScrap = async () => {};
+export const getDollarByOsmoScrap = async () => {
+  const res = await fetch(
+    "https://ayuda.osmowallet.com/es/articles/7437528-compra-y-vende-usdt-usdc"
+  );
+
+  console.log(await res.text());
+};
 
 export const getBitcoinValue = async () => {
   // Use coindesk data
@@ -96,7 +67,6 @@ export const getBitcoinValue = async () => {
 
 export const call = async () => {
   const res = await Promise.all([
-    getDollarValueBancoGuate(),
     getDollarValueByBinaceP2PType({ asset: "USDT", operation: "BUY" }),
     getDollarValueByBinaceP2PType({ asset: "USDT", operation: "SELL" }),
     getBitcoinValue(),
@@ -108,6 +78,9 @@ export const getLast30DaysOfDolarValueOfficialRecords = async (
   date: string
 ) => {
   try {
+    if (!date.length) {
+      throw new Error("Date is a required parameter");
+    }
     const pastDay = substract30DaysFromDate(date);
     const uri = `${constant.BANC_GT_URI}${constant.BANC_GT_TIPO_CAMBIO}`;
     const soapReq = `

@@ -1,15 +1,17 @@
 import { getLast30DaysOfDolarValueOfficialRecords } from "@/lib/functions";
-// import { substract30DaysFromDate } from "@/lib/utils";
+import { type NextRequest } from "next/server";
 
 export const revalidate = 60;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // const past = substract30DaysFromDate("01/10/2024");
-    const response = await getLast30DaysOfDolarValueOfficialRecords(
-      "01/10/2024"
-    );
-    return Response.json({ data: response });
+    const searchParams = request.nextUrl.searchParams;
+    const date = searchParams.get("date") || "";
+    const response = await getLast30DaysOfDolarValueOfficialRecords(date);
+    return Response.json({
+      data: response,
+      count: response.length,
+    });
   } catch (error) {
     throw error;
   }
