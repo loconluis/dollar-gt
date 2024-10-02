@@ -34,6 +34,7 @@ export const parseDataForLegibleIn30DayRange = (
   getToday();
 
   const formattedData: FormattedHistoricObject[] = [];
+  console.log(getToday());
   data.forEach((el) => {
     formattedData.push({
       fecha: el.Var.children[1].fecha.content,

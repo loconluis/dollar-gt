@@ -38,6 +38,7 @@ export function DollarPriceTracker() {
   const [gtqAmount, setGtqAmount] = useState("");
   const [usdAmount, setUsdAmount] = useState("");
   const { data, loading } = use30DaysData(getToday());
+  const dateForQuery = new Date();
 
   const calculateStats = (data: FormattedHistoricObject[]) => {
     const prices = data.map((d) => parseFloat(d.precio));
@@ -50,6 +51,7 @@ export function DollarPriceTracker() {
 
   const thirtyDayStats = calculateStats(data);
   const currentPrice = parseFloat(data[data.length - 1]?.precio);
+  const currentPrinceDate = data[data.length - 1]?.fecha;
   const startPrice = parseFloat(data[0]?.precio);
   const priceChange = (currentPrice - startPrice).toFixed(5);
   const percentageChange = (
@@ -151,6 +153,11 @@ export function DollarPriceTracker() {
                   >
                     {currentPrice.toFixed(5)} GTQ
                   </motion.p>
+                  <div className="text-slate-400">
+                    <small suppressHydrationWarning>
+                      a la fecha {currentPrinceDate}
+                    </small>
+                  </div>
                 </CardContent>
               </Card>
               <Card className="bg-gray-900 shadow-lg border border-gray-800">
@@ -200,8 +207,11 @@ export function DollarPriceTracker() {
                     <p className="text-2xl font-bold">Banco de Guatemala</p>
                   </motion.div>
                   <div className="text-slate-400">
-                    <small>
-                      Datos consultados: {new Date().toLocaleDateString()}
+                    <small suppressHydrationWarning>
+                      Datos consultados:{" "}
+                      {dateForQuery.toLocaleDateString() +
+                        " " +
+                        dateForQuery.toLocaleTimeString()}
                     </small>
                   </div>
                 </CardContent>
