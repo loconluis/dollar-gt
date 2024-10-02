@@ -26,3 +26,26 @@ export interface IBinanceP2PRespone {
     positiveRate?: number;
   };
 }
+
+interface HistoricObject {
+  moneda?: { content: string };
+  fecha: { content: string };
+  compra: { content: string };
+  venta: { content: string };
+}
+
+export interface FormattedHistoricObject {
+  fecha: string;
+  precio: string;
+}
+
+export interface ResponseData30DayRangeBancoGuatemala {
+  Var: {
+    children: [
+      Pick<HistoricObject, "moneda">,
+      Pick<HistoricObject, "fecha">,
+      Pick<HistoricObject, "venta">,
+      Pick<HistoricObject, "compra">
+    ];
+  };
+}
