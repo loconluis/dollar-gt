@@ -45,9 +45,7 @@ export const useFetchData = () => {
   }, [refresh]);
 
   const handleRefresh = () => {
-    console.log("hago algo");
     setRefresh((prevState) => {
-      console.log("prevState", prevState);
       return prevState + 1;
     });
   };

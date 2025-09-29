@@ -33,7 +33,6 @@ export const getDollarValueByBinaceP2PType = async ({
       currencyFiat: data?.data[0]?.adv?.fiatSymbol,
       operation,
     };
-    console.log("Binance " + operation + " VD: ", data?.data[0]?.adv?.price);
     return returnData;
   } catch (e) {
     throw new Error("Unable to fetch data from P2P of Binance " + e);
@@ -41,11 +40,9 @@ export const getDollarValueByBinaceP2PType = async ({
 };
 
 export const getDollarByOsmoScrap = async () => {
-  const res = await fetch(
+  await fetch(
     "https://ayuda.osmowallet.com/es/articles/7437528-compra-y-vende-usdt-usdc"
   );
-
-  console.log(await res.text());
 };
 
 export const getBitcoinValue = async () => {
@@ -61,7 +58,6 @@ export const getBitcoinValue = async () => {
       data.disclaimer +
       '\n Ver <a href="https://www.coindesk.com/" target="_blank">Coindesk</a>',
   };
-  console.log("BTC VD: ", data.bpi.GTQ.rate);
   return obj;
 };
 

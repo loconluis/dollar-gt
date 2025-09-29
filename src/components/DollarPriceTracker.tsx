@@ -19,25 +19,49 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUpIcon, ArrowDownIcon, InfoIcon, UserIcon } from "lucide-react";
+import { ArrowUpIcon, ArrowDownIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { use30DaysData } from "@/hooks/useFetch";
 import { getToday } from "@/lib/utils";
 import { FormattedHistoricObject } from "@/interfaces";
+import Navbar from "./navbar";
+
+const exchanges = [
+  {
+    platform: "Banco Industrial",
+    dollarValue: "",
+    info: "Este es el valor oficial del Banco de Guatemala",
+  },
+  {
+    platform: "BANRURAL Guatemala",
+    dollarValue: "",
+    info: "Binance es una exchange de Cryptomonedas donde puedes comprar en muchas formas una de ellas es P2P",
+    currencyFiat: "Q",
+    operation: "BUY",
+  },
+  {
+    platform: "Banco G&T",
+    dollarValue: "",
+    info: "Binance es una exchange de Cryptomonedas donde puedes comprar en muchas formas una de ellas es P2P",
+    currencyFiat: "Q",
+    operation: "SELL",
+  },
+  {
+    platform: "NexaBanco",
+    USDPrice: "",
+    GTQPrice: "",
+    info: "This data was produced from the CoinDesk Bitcoin Price Index (USD). Non-USD currency data converted using hourly conversion rate from openexchangerates.org",
+  },
+];
 
 export function DollarPriceTracker() {
   const [gtqAmount, setGtqAmount] = useState("");
   const [usdAmount, setUsdAmount] = useState("");
   const { data, loading } = use30DaysData(getToday());
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  console.log("Data", data);
   const dateForQuery = new Date();
 
   const calculateStats = (data: FormattedHistoricObject[]) => {
@@ -73,59 +97,7 @@ export function DollarPriceTracker() {
 
   return (
     <div className="min-h-screen bg-black text-gray-300 p-8">
-      <nav className="fixed top-0 left-0 right-0 bg-gray-900 p-4 z-10 border-b border-gray-800">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-white">Dólar en Guatemala</h1>
-          <div className="flex space-x-4">
-            <Dialog>
-              <DialogTrigger>
-                <InfoIcon className="text-gray-400 hover:text-white transition-colors" />
-              </DialogTrigger>
-              <DialogContent className="bg-gray-900 text-gray-300 border border-gray-800">
-                <DialogHeader>
-                  <DialogTitle className="text-white">
-                    Descargo de responsabilidad
-                  </DialogTitle>
-                </DialogHeader>
-                <p>
-                  La aplicación proporciona información sobre el historial del
-                  tipo de cambio del dólar en Guatemala durante los últimos 30
-                  días. Los datos son proporcionados por el Banco Central de
-                  Guatemala. Aunque nos esforzamos por ofrecer información
-                  precisa y actualizada, no garantizamos la exactitud,
-                  integridad o actualidad de la información presentada. Los
-                  tipos de cambio pueden variar y dependen de múltiples
-                  factores. Esta aplicación no debe considerarse como asesoría
-                  financiera. Te recomendamos consultar a un profesional antes
-                  de tomar decisiones financieras basadas en la información aquí
-                  presentada. El uso de esta aplicación implica la aceptación de
-                  estos términos.
-                </p>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger>
-                <UserIcon className="text-gray-400 hover:text-white transition-colors" />
-              </DialogTrigger>
-              <DialogContent className="bg-gray-900 text-gray-300 border border-gray-800">
-                <DialogHeader>
-                  <DialogTitle className="text-white">
-                    Información del autor
-                  </DialogTitle>
-                </DialogHeader>
-                <p>Creador por: Luis Locon</p>
-                <p>
-                  Contact:{" "}
-                  <a href="https://x.com/loconluis" target="_blank">
-                    @LoconLuis
-                  </a>
-                </p>
-                <p>GitHub: github.com/dollar-gt</p>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="mt-20 md:mx-40">
         <h2 className="text-3xl font-bold mb-8 text-center text-white">
@@ -219,6 +191,31 @@ export function DollarPriceTracker() {
             </motion.div>
           )}
         </AnimatePresence>
+        <motion.div className="my-20 ">
+          <h2 className="text-3xl font-bold mb-8 text-center text-white">
+            Cotizaciones
+          </h2>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Plataforma</TableHead>
+                <TableHead>Valor</TableHead>
+                {/* <TableHead>Info</TableHead> */}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {exchanges.map((item) => (
+                <TableRow key={item.platform}>
+                  <TableCell>{item.platform}</TableCell>
+                  <TableCell>{item.dollarValue}</TableCell>
+                  {/* <TableCell>{item.info}</TableCell> */}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </motion.div>
+
+        <Navbar />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
