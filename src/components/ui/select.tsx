@@ -25,10 +25,13 @@ interface SelectItemProps {
   children: React.ReactNode;
 }
 
-const SelectContext = React.createContext<{
+interface SelectContextType {
   value: string;
   onValueChange: (value: string) => void;
-}>({
+  setIsOpen?: (open: boolean) => void;
+}
+
+const SelectContext = React.createContext<SelectContextType>({
   value: "",
   onValueChange: () => {},
 });
@@ -37,7 +40,7 @@ const Select: React.FC<SelectProps> = ({ value, onValueChange, children, classNa
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <SelectContext.Provider value={{ value, onValueChange }}>
+    <SelectContext.Provider value={{ value, onValueChange, setIsOpen }}>
       <div className={cn("relative", className)}>
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
@@ -88,7 +91,7 @@ const SelectContent: React.FC<{ children: React.ReactNode; isOpen?: boolean }> =
 
 const SelectItem: React.FC<SelectItemProps> = ({ value, children }) => {
   const { value: currentValue, onValueChange } = React.useContext(SelectContext);
-  const { setIsOpen } = React.useContext(SelectContext) as any;
+  const { setIsOpen } = React.useContext(SelectContext);
 
   return (
     <button
