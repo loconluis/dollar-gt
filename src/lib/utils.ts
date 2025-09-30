@@ -19,13 +19,11 @@ export const substract30DaysFromDate = (date: string) => {
     parseInt(day)
   );
   const pastDate = sub(parseDate, { days: 29 });
-  return `${
-    pastDate.getDate() < 10 ? "0" + pastDate.getDate() : pastDate.getDate()
-  }/${
-    pastDate.getMonth() + 1 < 10
+  return `${pastDate.getDate() < 10 ? "0" + pastDate.getDate() : pastDate.getDate()
+    }/${pastDate.getMonth() + 1 < 10
       ? "0" + (pastDate.getMonth() + 1)
       : pastDate.getMonth() + 1
-  }/${pastDate.getFullYear()}`;
+    }/${pastDate.getFullYear()}`;
 };
 
 export const parseDataForLegibleIn30DayRange = (
@@ -34,7 +32,6 @@ export const parseDataForLegibleIn30DayRange = (
   getToday();
 
   const formattedData: FormattedHistoricObject[] = [];
-  console.log(getToday());
   data.forEach((el) => {
     formattedData.push({
       fecha: el.Var.children[1].fecha.content,

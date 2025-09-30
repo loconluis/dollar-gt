@@ -1,5 +1,5 @@
-import { DollarPriceTracker } from "@/components/DollarPriceTracker";
+import { ModernDollarTracker } from "@/components/ModernDollarTracker";
 
 export default function Home() {
-  return <DollarPriceTracker />;
+  return <ModernDollarTracker />;
 }

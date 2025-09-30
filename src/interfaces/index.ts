@@ -45,7 +45,15 @@ export interface ResponseData30DayRangeBancoGuatemala {
       Pick<HistoricObject, "moneda">,
       Pick<HistoricObject, "fecha">,
       Pick<HistoricObject, "venta">,
-      Pick<HistoricObject, "compra">
+      Pick<HistoricObject, "compra">,
     ];
   };
+}
+
+export interface IExchange {
+  name: string;
+  buy: number;
+  sell: number;
+  variation: string;
+  is_online: boolean;
 }
