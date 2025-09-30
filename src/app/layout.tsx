@@ -15,7 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Dollar Price Tracker - Guatemala | Tipo de Cambio USD a GTQ en Vivo",
+  title:
+    "DólarGT - Guatemala - Rastreador de Precio | Tipo de Cambio USD a GTQ en Vivo",
   description:
     "Consulta el tipo de cambio del dólar a quetzal guatemalteco en tiempo real. Gráficos históricos, análisis y conversor de moneda. Tasa de cambio actualizada de bancos de Guatemala.",
   keywords: [
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:
-      "Dollar Price Tracker - Guatemala | Tipo de Cambio USD a GTQ en Vivo",
+      "DólarGT - Guatemala - Rastreador de Precio | Tipo de Cambio USD a GTQ en Vivo",
     description:
       "Consulta el tipo de cambio del dólar a quetzal guatemalteco en tiempo real. Gráficos históricos, análisis y conversor de moneda.",
     url: "https://dolar.luislocon.dev",
@@ -52,10 +53,26 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dollar Price Tracker - Guatemala | Tipo de Cambio USD a GTQ",
+    title:
+      "DólarGT - Guatemala - Rastreador de Precio | Tipo de Cambio USD a GTQ en Vivo",
     description:
       "Consulta el tipo de cambio del dólar a quetzal guatemalteco en tiempo real. Gráficos históricos y análisis.",
     creator: "@dollargt",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/icon.png", sizes: "100x100", type: "image/png" },
+    ],
+    other: [
+      { url: "/icon.png", sizes: "100x100", type: "image/png" },
+      {
+        rel: "apple-touch-icon-precomposed",
+        url: "/icon.png",
+        sizes: "100x100",
+      },
+    ],
   },
   robots: {
     index: true,
