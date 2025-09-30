@@ -27,13 +27,13 @@ import {
 import {
   GlassCard,
   GlassCardHeader,
-  GlassCardTitle,
   GlassCardContent,
   MetricCard,
 } from "@/components/ui/glass-card";
 import { TrendChart } from "@/components/ui/chart";
 import CurrencyConverter from "@/components/ui/currency-converter";
 import ModernNavbar from "@/components/ui/modern-navbar";
+import { StructuredData } from "@/components/StructuredData";
 import { use30DaysData, useFetchExchange } from "@/hooks/useFetch";
 import { getToday } from "@/lib/utils";
 import { FormattedHistoricObject } from "@/interfaces";
@@ -57,16 +57,16 @@ const StatCard: React.FC<StatCardProps> = ({
   description,
 }) => (
   <GlassCard variant="minimal" className="h-full">
-    <GlassCardContent className="p-6">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">{title}</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-foreground">{value}</span>
+    <GlassCardContent className="p-3 sm:p-4 lg:p-6">
+      <div className="flex items-start justify-between gap-2">
+        <div className="space-y-1 sm:space-y-2 flex-1 min-w-0">
+          <p className="text-xs sm:text-sm text-muted-foreground">{title}</p>
+          <div className="flex items-baseline gap-1 sm:gap-2">
+            <span className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground truncate">{value}</span>
             {change && (
               <span
                 className={cn(
-                  "text-xs font-medium",
+                  "text-xs font-medium whitespace-nowrap",
                   changeType === "positive" && "text-green-500",
                   changeType === "negative" && "text-red-500",
                   changeType === "neutral" && "text-muted-foreground",
@@ -80,7 +80,7 @@ const StatCard: React.FC<StatCardProps> = ({
             <p className="text-xs text-muted-foreground">{description}</p>
           )}
         </div>
-        {icon && <div className="p-2 rounded-lg bg-accent/20">{icon}</div>}
+        {icon && <div className="p-1.5 sm:p-2 rounded-lg bg-accent/20 flex-shrink-0">{icon}</div>}
       </div>
     </GlassCardContent>
   </GlassCard>
@@ -90,24 +90,33 @@ export function ModernDollarTracker() {
   const { exchangeData, loadingExchange } = useFetchExchange();
   const { data, loading } = use30DaysData(getToday());
   const [lastUpdated, setLastUpdated] = React.useState(new Date());
-  const [selectedExchangeRate, setSelectedExchangeRate] =
-    React.useState("");
+  const [selectedExchangeRate, setSelectedExchangeRate] = React.useState("");
 
   // Calculate best BUY (highest) and SELL (lowest) values
   const bestBuyValue =
     exchangeData.length > 0
-      ? Math.max(...exchangeData.map((item) => typeof item.buy === 'string' ? parseFloat(item.buy) : item.buy || 0))
+      ? Math.max(
+          ...exchangeData.map((item) =>
+            typeof item.buy === "string" ? parseFloat(item.buy) : item.buy || 0,
+          ),
+        )
       : 0;
   const bestSellValue =
     exchangeData.length > 0
-      ? Math.min(...exchangeData.map((item) => typeof item.sell === 'string' ? parseFloat(item.sell) : item.sell || 0))
+      ? Math.min(
+          ...exchangeData.map((item) =>
+            typeof item.sell === "string"
+              ? parseFloat(item.sell)
+              : item.sell || 0,
+          ),
+        )
       : 0;
 
   // Format exchangeData for CurrencyConverter with unique IDs
   const formattedExchangeRates = exchangeData.map((item, index) => ({
-    id: `${item.name.toLowerCase().replace(/\s+/g, '-')}-${index}`,
+    id: `${item.name.toLowerCase().replace(/\s+/g, "-")}-${index}`,
     name: item.name,
-    rate: typeof item.buy === 'string' ? parseFloat(item.buy) : item.buy || 0,
+    rate: typeof item.buy === "string" ? parseFloat(item.buy) : item.buy || 0,
     description: item.is_online ? "Ventanilla Virtual" : "Banco tradicional",
     is_online: item.is_online,
   }));
@@ -123,9 +132,10 @@ export function ModernDollarTracker() {
   // Set default exchange rate when data loads (prioritize Banco de Guatemala)
   React.useEffect(() => {
     if (formattedExchangeRates.length > 0 && !selectedExchangeRate) {
-      const bancoGuatemala = formattedExchangeRates.find(rate =>
-        rate.name.toLowerCase().includes("banco de guatemala") ||
-        rate.name.toLowerCase().includes("banguat")
+      const bancoGuatemala = formattedExchangeRates.find(
+        (rate) =>
+          rate.name.toLowerCase().includes("banco de guatemala") ||
+          rate.name.toLowerCase().includes("banguat"),
       );
       if (bancoGuatemala) {
         setSelectedExchangeRate(bancoGuatemala.id);
@@ -196,22 +206,26 @@ export function ModernDollarTracker() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-background">
+        <StructuredData exchangeData={exchangeData} />
         <ModernNavbar />
 
-        <main className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <main className="pt-16 sm:pt-20 max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pb-8 sm:pb-12">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center mb-6 sm:mb-12"
           >
-            <h1 className="text-4xl font-bold tracking-tight mb-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-2 sm:mb-4 px-2">
               Tipo de Cambio USD a GTQ
             </h1>
-            <p className="text-lg text-muted-foreground">
-              Seguimiento en tiempo real del precio del dólar en Guatemala
+            <h2 className="text-lg sm:text-xl text-muted-foreground mb-1 sm:mb-2 px-2">
+              Seguimiento en tiempo real - Guatemala
+            </h2>
+            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground px-4 max-w-2xl mx-auto">
+              Consulta las tasas de cambio de bancos con gráficos históricos
             </p>
-            <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
               <span>
                 Última actualización: {lastUpdated.toLocaleTimeString()}
               </span>
@@ -222,7 +236,7 @@ export function ModernDollarTracker() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-12"
           >
             <MetricCard
               title="Precio Actual"
@@ -258,17 +272,19 @@ export function ModernDollarTracker() {
           </motion.div>
 
           {/* Chart and Stats */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-12">
             {/* Price Chart */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="h-[500px]"
+              className="h-[400px] sm:h-[500px]"
             >
               <GlassCard variant="elevated" className="h-full">
                 <GlassCardHeader>
-                  <GlassCardTitle>Tendencia de Precio 30 Días</GlassCardTitle>
+                  <h3 className="text-lg font-semibold">
+                    Tendencia de Precio 30 Días
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     Fuente: Banco de Guatemala
                   </p>
@@ -293,11 +309,13 @@ export function ModernDollarTracker() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="h-[500px]"
+              className="h-[400px] sm:h-[500px]"
             >
               <GlassCard variant="elevated" className="h-full">
                 <GlassCardHeader>
-                  <GlassCardTitle>Estadísticas 30 Días</GlassCardTitle>
+                  <h3 className="text-lg font-semibold">
+                    Estadísticas 30 Días
+                  </h3>
                 </GlassCardHeader>
                 <GlassCardContent className="p-6 h-[calc(100%-80px)]">
                   <div className="h-full flex flex-col space-y-4">
@@ -330,12 +348,14 @@ export function ModernDollarTracker() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="mb-12"
+            className="mb-6 sm:mb-12"
           >
             <GlassCard variant="elevated">
               <GlassCardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <GlassCardTitle>Tasas de Cambio por Plataforma</GlassCardTitle>
+                  <h3 className="text-lg font-semibold">
+                    Tasas de Cambio por Plataforma
+                  </h3>
                   <div className="text-xs text-muted-foreground">
                     Datos de{" "}
                     <a
@@ -348,17 +368,17 @@ export function ModernDollarTracker() {
                     </a>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-xs text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-l-4 border-l-green-500"></div>
-                    <span>Mejor precio de compra</span>
+                    <div className="w-3 h-3 border-l-2 border-l-green-500 sm:border-l-4"></div>
+                    <span>Mejor compra</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-r-4 border-r-blue-500"></div>
-                    <span>Mejor precio de venta</span>
+                    <div className="w-3 h-3 border-r-2 border-r-blue-500 sm:border-r-4"></div>
+                    <span>Mejor venta</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-primary" />
+                    <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
                     <span>Ventanilla Virtual</span>
                   </div>
                 </div>
@@ -385,81 +405,89 @@ export function ModernDollarTracker() {
                     ))}
                   </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Plataforma</TableHead>
-                        <TableHead className="text-right">
-                          Compra (GTQ)
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Venta (GTQ)
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Variabilidad
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...exchangeData]
-                        .sort((a, b) => a.name.localeCompare(b.name))
-                        .map((item, index) => (
-                          <TableRow
-                            key={item.name + "_" + index}
-                            className={cn(
-                              (typeof item.buy === 'string' ? parseFloat(item.buy) : item.buy || 0) === bestBuyValue &&
-                                "border-l-4 border-l-green-500",
-                              (typeof item.sell === 'string' ? parseFloat(item.sell) : item.sell || 0) === bestSellValue &&
-                                "border-r-4 border-r-blue-500",
-                            )}
-                          >
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <div className="font-medium">{item.name}</div>
-                                {item.is_online && (
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Globe className="w-4 h-4 text-primary" />
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Ventanilla Virtual</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right font-medium">
-                              {(typeof item.buy === 'string' ? parseFloat(item.buy) : item.buy || 0).toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right font-medium">
-                              {(typeof item.sell === 'string' ? parseFloat(item.sell) : item.sell || 0).toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <span
-                                className={cn(
-                                  "font-medium",
-                                  item.variation &&
-                                    !item.variation.includes("-")
-                                    ? "text-green-500"
-                                    : "text-red-500",
-                                )}
-                              >
-                                {item.variation
-                                  ? parseFloat(item.variation).toFixed(2)
-                                  : ""}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
+                  <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[100px] sm:w-auto">Banco</TableHead>
+                          <TableHead className="text-right w-[60px]">Compra</TableHead>
+                          <TableHead className="text-right w-[60px]">Venta</TableHead>
+                          <TableHead className="text-right w-[60px] hidden lg:table-cell">Variación</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {[...exchangeData]
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((item, index) => (
+                            <TableRow
+                              key={item.name + "_" + index}
+                              className={cn(
+                                (typeof item.buy === "string"
+                                  ? parseFloat(item.buy)
+                                  : item.buy || 0) === bestBuyValue &&
+                                  "border-l-2 sm:border-l-4 border-l-green-500",
+                                (typeof item.sell === "string"
+                                  ? parseFloat(item.sell)
+                                  : item.sell || 0) === bestSellValue &&
+                                  "border-r-2 sm:border-r-4 border-r-blue-500",
+                              )}
+                            >
+                              <TableCell className="font-medium p-2 sm:p-4">
+                                <div className="flex items-center gap-1.5 sm:gap-2">
+                                  <div className="font-medium text-xs sm:text-sm truncate max-w-[80px] sm:max-w-none">
+                                    {item.name}
+                                  </div>
+                                  {item.is_online && (
+                                    <Tooltip>
+                                      <TooltipTrigger>
+                                        <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p className="text-xs">Ventanilla Virtual</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-right font-medium p-2 sm:p-4 text-xs sm:text-sm">
+                                {(typeof item.buy === "string"
+                                  ? parseFloat(item.buy)
+                                  : item.buy || 0
+                                ).toFixed(2)}
+                              </TableCell>
+                              <TableCell className="text-right font-medium p-2 sm:p-4 text-xs sm:text-sm">
+                                {(typeof item.sell === "string"
+                                  ? parseFloat(item.sell)
+                                  : item.sell || 0
+                                ).toFixed(2)}
+                              </TableCell>
+                              <TableCell className="text-right p-2 sm:p-4 hidden lg:table-cell">
+                                <span
+                                  className={cn(
+                                    "font-medium text-xs sm:text-sm",
+                                    item.variation &&
+                                      !item.variation.includes("-")
+                                      ? "text-green-500"
+                                      : "text-red-500",
+                                  )}
+                                >
+                                  {item.variation
+                                    ? parseFloat(item.variation).toFixed(2)
+                                    : ""}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 )}
               </GlassCardContent>
             </GlassCard>
           </motion.div>
 
           {/* Currency Converter and Ads */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-start">
             {/* Currency Converter */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -469,7 +497,7 @@ export function ModernDollarTracker() {
             >
               <GlassCard variant="elevated">
                 <GlassCardHeader>
-                  <GlassCardTitle>Conversor de Moneda</GlassCardTitle>
+                  <h3 className="text-lg font-semibold">Conversor de Moneda</h3>
                 </GlassCardHeader>
                 <GlassCardContent>
                   <CurrencyConverter
@@ -490,7 +518,7 @@ export function ModernDollarTracker() {
             >
               <GlassCard variant="elevated">
                 <GlassCardHeader>
-                  <GlassCardTitle>Anuncio</GlassCardTitle>
+                  <h3 className="text-lg font-semibold">Anuncio</h3>
                 </GlassCardHeader>
                 <GlassCardContent>
                   <div className="bg-muted/20 rounded-lg p-4 min-h-[250px] flex items-center justify-center">
