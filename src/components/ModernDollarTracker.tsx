@@ -34,10 +34,13 @@ import { TrendChart } from "@/components/ui/chart";
 import CurrencyConverter from "@/components/ui/currency-converter";
 import ModernNavbar from "@/components/ui/modern-navbar";
 import { StructuredData } from "@/components/StructuredData";
+import { LocalSEO } from "@/components/LocalSEO";
+import { SEOFooter } from "@/components/SEOFooter";
 import { use30DaysData, useFetchExchange } from "@/hooks/useFetch";
 import { getToday } from "@/lib/utils";
 import { FormattedHistoricObject } from "@/interfaces";
 import { cn } from "@/lib/utils";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -62,7 +65,9 @@ const StatCard: React.FC<StatCardProps> = ({
         <div className="space-y-1 sm:space-y-2 flex-1 min-w-0">
           <p className="text-xs sm:text-sm text-muted-foreground">{title}</p>
           <div className="flex items-baseline gap-1 sm:gap-2">
-            <span className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground truncate">{value}</span>
+            <span className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground truncate">
+              {value}
+            </span>
             {change && (
               <span
                 className={cn(
@@ -80,17 +85,26 @@ const StatCard: React.FC<StatCardProps> = ({
             <p className="text-xs text-muted-foreground">{description}</p>
           )}
         </div>
-        {icon && <div className="p-1.5 sm:p-2 rounded-lg bg-accent/20 flex-shrink-0">{icon}</div>}
+        {icon && (
+          <div className="p-1.5 sm:p-2 rounded-lg bg-accent/20 flex-shrink-0">
+            {icon}
+          </div>
+        )}
       </div>
     </GlassCardContent>
   </GlassCard>
 );
+
+type SortField = "name" | "buy" | "sell";
+type SortDirection = "asc" | "desc" | null;
 
 export function ModernDollarTracker() {
   const { exchangeData, loadingExchange } = useFetchExchange();
   const { data, loading } = use30DaysData(getToday());
   const [lastUpdated, setLastUpdated] = React.useState(new Date());
   const [selectedExchangeRate, setSelectedExchangeRate] = React.useState("");
+  const [sortField, setSortField] = React.useState<SortField>("name");
+  const [sortDirection, setSortDirection] = React.useState<SortDirection>(null);
 
   // Calculate best BUY (highest) and SELL (lowest) values
   const bestBuyValue =
@@ -120,6 +134,91 @@ export function ModernDollarTracker() {
     description: item.is_online ? "Ventanilla Virtual" : "Banco tradicional",
     is_online: item.is_online,
   }));
+
+  // Handle sorting
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      if (sortDirection === "asc") {
+        setSortDirection("desc");
+      } else if (sortDirection === "desc") {
+        setSortDirection(null);
+        setSortField("name");
+      } else {
+        setSortDirection("asc");
+      }
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  // Get sorted exchange data
+  const getSortedExchangeData = () => {
+    if (!sortDirection || sortField === "name") {
+      return [...exchangeData].sort((a, b) =>
+        cleanBankName(a.name).localeCompare(cleanBankName(b.name)),
+      );
+    }
+
+    return [...exchangeData].sort((a, b) => {
+      let aValue: number;
+      let bValue: number;
+
+      if (sortField === "buy") {
+        aValue = typeof a.buy === "string" ? parseFloat(a.buy) : a.buy || 0;
+        bValue = typeof b.buy === "string" ? parseFloat(b.buy) : b.buy || 0;
+      } else if (sortField === "sell") {
+        aValue = typeof a.sell === "string" ? parseFloat(a.sell) : a.sell || 0;
+        bValue = typeof b.sell === "string" ? parseFloat(b.sell) : b.sell || 0;
+      } else {
+        aValue = 0;
+        bValue = 0;
+      }
+
+      return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+    });
+  };
+
+  // Get sort icon for column
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field || !sortDirection) {
+      return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
+    }
+    return sortDirection === "asc" ? (
+      <ArrowUp className="w-4 h-4 text-primary" />
+    ) : (
+      <ArrowDown className="w-4 h-4 text-primary" />
+    );
+  };
+
+  // Clean bank name by removing 'Banco' word
+  const cleanBankName = (name: string) => {
+    return name.replace(/Banco\s+/i, "").trim();
+  };
+
+  // Get exchange name with best buy rate
+  const getBestBuyExchange = () => {
+    if (exchangeData.length === 0) return "No disponible";
+    const bestExchange = exchangeData.find(
+      (item) =>
+        (typeof item.buy === "string"
+          ? parseFloat(item.buy)
+          : item.buy || 0) === bestBuyValue,
+    );
+    return bestExchange ? cleanBankName(bestExchange.name) : "No disponible";
+  };
+
+  // Get exchange name with best sell rate
+  const getBestSellExchange = () => {
+    if (exchangeData.length === 0) return "No disponible";
+    const bestExchange = exchangeData.find(
+      (item) =>
+        (typeof item.sell === "string"
+          ? parseFloat(item.sell)
+          : item.sell || 0) === bestSellValue,
+    );
+    return bestExchange ? cleanBankName(bestExchange.name) : "No disponible";
+  };
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -207,88 +306,211 @@ export function ModernDollarTracker() {
     <TooltipProvider>
       <div className="min-h-screen bg-background">
         <StructuredData exchangeData={exchangeData} />
+        <LocalSEO currentPrice={currentPrice} />
         <ModernNavbar />
 
         <main className="pt-16 sm:pt-20 max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pb-8 sm:pb-12">
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-6 sm:mb-12"
-          >
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-2 sm:mb-4 px-2">
-              Tipo de Cambio USD a GTQ
-            </h1>
-            <h2 className="text-lg sm:text-xl text-muted-foreground mb-1 sm:mb-2 px-2">
-              Seguimiento en tiempo real - Guatemala
-            </h2>
-            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground px-4 max-w-2xl mx-auto">
-              Consulta las tasas de cambio de bancos con gráficos históricos
-            </p>
-            <div className="flex items-center justify-center gap-2 mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
-              <span>
-                Última actualización: {lastUpdated.toLocaleTimeString()}
-              </span>
+          <header>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-6 sm:mb-12"
+            >
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-2 sm:mb-4 px-2">
+                Tipo de Cambio Dólar a Quetzal Guatemalteco
+              </h1>
+              <h2 className="text-lg sm:text-xl text-muted-foreground mb-1 sm:mb-2 px-2">
+                Seguimiento en tiempo real - Guatemala
+              </h2>
+              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground px-4 max-w-2xl mx-auto">
+                Consulta las tasas de cambio de bancos con gráficos históricos. Encuentra las mejores tasas para <a href="#conversor-moneda-heading" className="text-primary hover:underline">convertir dólares a quetzales</a> y visualiza el <a href="#graficos-analisis-heading" className="text-primary hover:underline">historial de precios</a>.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-4 mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
+                <span>
+                  Última actualización: {lastUpdated.toLocaleTimeString()}
+                </span>
+                <div className="flex items-center gap-3">
+                  <a href="#tasas-bancos-heading" className="text-primary hover:underline">Ver tasas por banco</a>
+                  <span>•</span>
+                  <a href="#mejores-tasas-heading" className="text-primary hover:underline">Mejores tasas</a>
+                  <span>•</span>
+                  <a href="#conversor-moneda-heading" className="text-primary hover:underline">Conversor</a>
+                </div>
+              </div>
+            </motion.div>
+          </header>
+
+          {/* Banco de Guatemala Section */}
+          <section aria-labelledby="banguat-heading">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 sm:mb-6"
+            >
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                <div className="h-px bg-border flex-1"></div>
+                <h2 id="banguat-heading" className="text-base sm:text-lg font-semibold text-foreground px-3">
+                  Banco de Guatemala
+                </h2>
+                <div className="h-px bg-border flex-1"></div>
+              </div>
+            {/* Main Metrics - First Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+              <MetricCard
+                title="Precio Actual"
+                value={`${currentPrice.toFixed(5)} GTQ`}
+                subtitle={`Al ${currentPriceDate} - Fuente: Banco de Guatemala`}
+                trend={{
+                  value: Math.abs(parseFloat(percentageChange ?? 0)),
+                  label: "30 días",
+                  isPositive: isPriceUp,
+                }}
+                icon={<Building2 className="w-5 h-5 text-primary" />}
+              />
+
+              <MetricCard
+                title="Cambio 30 Días"
+                value={`${isPriceUp ? "+" : ""}${priceChange} GTQ`}
+                subtitle={`${isPriceUp ? "+" : ""}${percentageChange}%`}
+                icon={
+                  isPriceUp ? (
+                    <TrendingUp className={`w-5 h-5 ${trendColor}`} />
+                  ) : (
+                    <TrendingDown className={`w-5 h-5 ${trendColor}`} />
+                  )
+                }
+              />
+
+              <MetricCard
+                title="Volatilidad"
+                value={`${thirtyDayStats.volatility}%`}
+                subtitle="Rango de 30 días"
+                icon={<RefreshCw className="w-5 h-5 text-primary" />}
+              />
             </div>
           </motion.div>
+          </section>
 
-          {/* Main Metrics */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-12"
-          >
-            <MetricCard
-              title="Precio Actual"
-              value={`${currentPrice.toFixed(5)} GTQ`}
-              subtitle={`Al ${currentPriceDate}`}
-              trend={{
-                value: Math.abs(parseFloat(percentageChange ?? 0)),
-                label: "30 días",
-                isPositive: isPriceUp,
-              }}
-              icon={<Building2 className="w-5 h-5 text-primary" />}
-            />
+          {/* Mejores Tasas Section */}
+          <section aria-labelledby="mejores-tasas-heading">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mb-6 sm:mb-12"
+            >
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                <div className="h-px bg-border flex-1"></div>
+                <h2 id="mejores-tasas-heading" className="text-base sm:text-lg font-semibold text-foreground px-3">
+                  Las Mejores Tasas
+                </h2>
+                <div className="h-px bg-border flex-1"></div>
+              </div>
+            {/* Best Rates and Call to Action - Second Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+              <MetricCard
+                title="Mejor Compra"
+                value={
+                  bestBuyValue > 0 ? `${bestBuyValue.toFixed(2)} GTQ` : "N/A"
+                }
+                subtitle={
+                  bestBuyValue > 0 ? getBestBuyExchange() : "No disponible"
+                }
+                icon={
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500 border-2 border-green-600"></div>
+                    <span>🤑</span>
+                  </div>
+                }
+              />
 
-            <MetricCard
-              title="Cambio 30 Días"
-              value={`${isPriceUp ? "+" : ""}${priceChange} GTQ`}
-              subtitle={`${isPriceUp ? "+" : ""}${percentageChange}%`}
-              icon={
-                isPriceUp ? (
-                  <TrendingUp className={`w-5 h-5 ${trendColor}`} />
-                ) : (
-                  <TrendingDown className={`w-5 h-5 ${trendColor}`} />
-                )
-              }
-            />
+              <MetricCard
+                title="Mejor Venta"
+                value={
+                  bestSellValue > 0 ? `${bestSellValue.toFixed(2)} GTQ` : "N/A"
+                }
+                subtitle={
+                  bestSellValue > 0 ? getBestSellExchange() : "No disponible"
+                }
+                icon={
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-blue-600"></div>
+                    <span>💸</span>
+                  </div>
+                }
+              />
 
-            <MetricCard
-              title="Volatilidad"
-              value={`${thirtyDayStats.volatility}%`}
-              subtitle="Rango de 30 días"
-              icon={<RefreshCw className="w-5 h-5 text-primary" />}
-            />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                onClick={() => {
+                  const table = document.getElementById("exchange-rates-table");
+                  if (table) {
+                    table.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }
+                }}
+                className="cursor-pointer"
+              >
+                <GlassCard
+                  variant="minimal"
+                  className="h-full hover:bg-accent/50 transition-colors"
+                >
+                  <GlassCardContent className="p-3 sm:p-4 lg:p-6 h-full">
+                    <div className="flex flex-col h-full items-center justify-center text-center space-y-3">
+                      <span>📊</span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground mb-1">
+                          Ver Todas las Tasas
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Para ver más datos, ve la tabla comparativa
+                        </p>
+                        <span className="text-xs text-primary font-medium inline-flex items-center gap-1">
+                          Ver tabla completa
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </GlassCardContent>
+                </GlassCard>
+              </motion.div>
+            </div>
           </motion.div>
+          </section>
 
           {/* Chart and Stats */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-12">
-            {/* Price Chart */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="h-[400px] sm:h-[500px]"
-            >
-              <GlassCard variant="elevated" className="h-full">
-                <GlassCardHeader>
-                  <h3 className="text-lg font-semibold">
-                    Tendencia de Precio 30 Días
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Fuente: Banco de Guatemala
-                  </p>
-                </GlassCardHeader>
+          <section aria-labelledby="graficos-analisis-heading">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-12">
+              {/* Price Chart */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="h-[400px] sm:h-[500px]"
+              >
+                <GlassCard variant="elevated" className="h-full">
+                  <GlassCardHeader>
+                    <h3 id="graficos-analisis-heading" className="text-lg font-semibold">
+                      Gráficos y Análisis de Precios
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Tendencia del tipo de cambio USD a GTQ últimos 30 días
+                    </p>
+                  </GlassCardHeader>
                 <GlassCardContent className="p-6 h-[calc(100%-100px)]">
                   <TrendChart
                     data={data.map((item) => ({
@@ -304,19 +526,19 @@ export function ModernDollarTracker() {
               </GlassCard>
             </motion.div>
 
-            {/* Statistics */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-              className="h-[400px] sm:h-[500px]"
-            >
-              <GlassCard variant="elevated" className="h-full">
-                <GlassCardHeader>
-                  <h3 className="text-lg font-semibold">
-                    Estadísticas 30 Días
-                  </h3>
-                </GlassCardHeader>
+              {/* Statistics */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="h-[400px] sm:h-[500px]"
+              >
+                <GlassCard variant="elevated" className="h-full">
+                  <GlassCardHeader>
+                    <h3 className="text-lg font-semibold">
+                      Estadísticas 30 Días
+                    </h3>
+                  </GlassCardHeader>
                 <GlassCardContent className="p-6 h-[calc(100%-80px)]">
                   <div className="h-full flex flex-col space-y-4">
                     <StatCard
@@ -341,21 +563,24 @@ export function ModernDollarTracker() {
                 </GlassCardContent>
               </GlassCard>
             </motion.div>
-          </div>
+            </div>
+          </section>
 
           {/* Exchange Rates Table */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mb-6 sm:mb-12"
-          >
-            <GlassCard variant="elevated">
-              <GlassCardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <h3 className="text-lg font-semibold">
-                    Tasas de Cambio por Plataforma
-                  </h3>
+          <section aria-labelledby="tasas-bancos-heading">
+            <motion.div
+              id="exchange-rates-table"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mb-6 sm:mb-12"
+            >
+              <GlassCard variant="elevated">
+                <GlassCardHeader>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <h3 id="tasas-bancos-heading" className="text-lg font-semibold">
+                      Tasas de Cambio por Banco
+                    </h3>
                   <div className="text-xs text-muted-foreground">
                     Datos de{" "}
                     <a
@@ -368,18 +593,20 @@ export function ModernDollarTracker() {
                     </a>
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-xs text-muted-foreground">
+                <div className="flex flex-wrap gap-3 sm:gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
+                    <span>Banca en línea</span>
+                  </div>
+
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 border-l-2 border-l-green-500 sm:border-l-4"></div>
                     <span>Mejor compra</span>
                   </div>
+
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 border-r-2 border-r-blue-500 sm:border-r-4"></div>
                     <span>Mejor venta</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-                    <span>Ventanilla Virtual</span>
                   </div>
                 </div>
               </GlassCardHeader>
@@ -409,75 +636,112 @@ export function ModernDollarTracker() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="w-[100px] sm:w-auto">Banco</TableHead>
-                          <TableHead className="text-right w-[60px]">Compra</TableHead>
-                          <TableHead className="text-right w-[60px]">Venta</TableHead>
-                          <TableHead className="text-right w-[60px] hidden lg:table-cell">Variación</TableHead>
+                          <TableHead
+                            className="w-[100px] sm:w-auto cursor-pointer hover:bg-accent/50 transition-colors"
+                            onClick={() => handleSort("name")}
+                          >
+                            <div className="flex items-center gap-2">Banco</div>
+                          </TableHead>
+                          <TableHead
+                            className="text-right w-[60px] cursor-pointer hover:bg-accent/50 transition-colors"
+                            onClick={() => handleSort("buy")}
+                          >
+                            <div className="flex items-center justify-end gap-2">
+                              Compra
+                              {getSortIcon("buy")}
+                            </div>
+                          </TableHead>
+                          <TableHead
+                            className="text-right w-[60px] cursor-pointer hover:bg-accent/50 transition-colors"
+                            onClick={() => handleSort("sell")}
+                          >
+                            <div className="flex items-center justify-end gap-2">
+                              Venta
+                              {getSortIcon("sell")}
+                            </div>
+                          </TableHead>
+                          <TableHead className="text-right w-[60px] hidden lg:table-cell">
+                            Variación
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {[...exchangeData]
-                          .sort((a, b) => a.name.localeCompare(b.name))
-                          .map((item, index) => (
-                            <TableRow
-                              key={item.name + "_" + index}
-                              className={cn(
-                                (typeof item.buy === "string"
-                                  ? parseFloat(item.buy)
-                                  : item.buy || 0) === bestBuyValue &&
-                                  "border-l-2 sm:border-l-4 border-l-green-500",
-                                (typeof item.sell === "string"
-                                  ? parseFloat(item.sell)
-                                  : item.sell || 0) === bestSellValue &&
-                                  "border-r-2 sm:border-r-4 border-r-blue-500",
-                              )}
-                            >
-                              <TableCell className="font-medium p-2 sm:p-4">
-                                <div className="flex items-center gap-1.5 sm:gap-2">
-                                  <div className="font-medium text-xs sm:text-sm truncate max-w-[80px] sm:max-w-none">
-                                    {item.name}
-                                  </div>
-                                  {item.is_online && (
-                                    <Tooltip>
-                                      <TooltipTrigger>
-                                        <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-primary flex-shrink-0" />
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p className="text-xs">Ventanilla Virtual</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  )}
+                        {getSortedExchangeData().map((item, index) => (
+                          <TableRow
+                            key={item.name + "_" + index}
+                            className={cn(
+                              (typeof item.buy === "string"
+                                ? parseFloat(item.buy)
+                                : item.buy || 0) === bestBuyValue &&
+                                "border-l-2 sm:border-l-4 border-l-green-500",
+                              (typeof item.sell === "string"
+                                ? parseFloat(item.sell)
+                                : item.sell || 0) === bestSellValue &&
+                                "border-r-2 sm:border-r-4 border-r-blue-500",
+                              item.is_online && "bg-muted/20",
+                            )}
+                          >
+                            <TableCell className="font-medium p-2 sm:p-4">
+                              <div className="flex items-center gap-1.5 sm:gap-2">
+                                <div className="font-medium text-xs sm:text-sm truncate max-w-[80px] sm:max-w-none">
+                                  {cleanBankName(item.name)}
                                 </div>
-                              </TableCell>
-                              <TableCell className="text-right font-medium p-2 sm:p-4 text-xs sm:text-sm">
-                                {(typeof item.buy === "string"
-                                  ? parseFloat(item.buy)
-                                  : item.buy || 0
-                                ).toFixed(2)}
-                              </TableCell>
-                              <TableCell className="text-right font-medium p-2 sm:p-4 text-xs sm:text-sm">
-                                {(typeof item.sell === "string"
-                                  ? parseFloat(item.sell)
-                                  : item.sell || 0
-                                ).toFixed(2)}
-                              </TableCell>
-                              <TableCell className="text-right p-2 sm:p-4 hidden lg:table-cell">
-                                <span
-                                  className={cn(
-                                    "font-medium text-xs sm:text-sm",
-                                    item.variation &&
-                                      !item.variation.includes("-")
-                                      ? "text-green-500"
-                                      : "text-red-500",
-                                  )}
-                                >
-                                  {item.variation
-                                    ? parseFloat(item.variation).toFixed(2)
-                                    : ""}
-                                </span>
-                              </TableCell>
-                            </TableRow>
-                          ))}
+                                {item.is_online && (
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-sm border border-border/50">
+                                        <span className="text-xs text-muted-foreground sm:hidden">
+                                          En línea
+                                        </span>
+                                        <Globe className="w-3 h-3 text-muted-foreground flex-shrink-0 hidden sm:block" />
+                                        <span className="text-xs text-muted-foreground hidden sm:inline">
+                                          Banca en línea
+                                        </span>
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <div className="space-y-1">
+                                        <p className="font-medium">
+                                          Ventanilla Virtual
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Mejores tasas online
+                                        </p>
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right font-medium p-2 sm:p-4 text-xs sm:text-sm">
+                              {(typeof item.buy === "string"
+                                ? parseFloat(item.buy)
+                                : item.buy || 0
+                              ).toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-right font-medium p-2 sm:p-4 text-xs sm:text-sm">
+                              {(typeof item.sell === "string"
+                                ? parseFloat(item.sell)
+                                : item.sell || 0
+                              ).toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-right p-2 sm:p-4 hidden lg:table-cell">
+                              <span
+                                className={cn(
+                                  "font-medium text-xs sm:text-sm",
+                                  item.variation &&
+                                    !item.variation.includes("-")
+                                    ? "text-green-500"
+                                    : "text-red-500",
+                                )}
+                              >
+                                {item.variation
+                                  ? parseFloat(item.variation).toFixed(2)
+                                  : ""}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                       </TableBody>
                     </Table>
                   </div>
@@ -485,6 +749,7 @@ export function ModernDollarTracker() {
               </GlassCardContent>
             </GlassCard>
           </motion.div>
+          </section>
 
           {/* Currency Converter and Ads */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-start">
@@ -497,7 +762,7 @@ export function ModernDollarTracker() {
             >
               <GlassCard variant="elevated">
                 <GlassCardHeader>
-                  <h3 className="text-lg font-semibold">Conversor de Moneda</h3>
+                  <h3 id="conversor-moneda-heading" className="text-lg font-semibold">Conversor de Moneda USD a GTQ</h3>
                 </GlassCardHeader>
                 <GlassCardContent>
                   <CurrencyConverter
@@ -518,7 +783,7 @@ export function ModernDollarTracker() {
             >
               <GlassCard variant="elevated">
                 <GlassCardHeader>
-                  <h3 className="text-lg font-semibold">Anuncio</h3>
+                  <h3 className="text-lg font-semibold">Publicidad</h3>
                 </GlassCardHeader>
                 <GlassCardContent>
                   <div className="bg-muted/20 rounded-lg p-4 min-h-[250px] flex items-center justify-center">
@@ -531,6 +796,9 @@ export function ModernDollarTracker() {
             </motion.div>
           </div>
         </main>
+
+        {/* SEO Footer */}
+        <SEOFooter />
       </div>
     </TooltipProvider>
   );

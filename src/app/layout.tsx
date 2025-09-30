@@ -16,19 +16,32 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title:
-    "DólarGT - Guatemala - Rastreador de Precio | Tipo de Cambio USD a GTQ en Vivo",
+  title: {
+    default: "Tipo de Cambio Dólar a Quetzal Guatemalteco | Precios en Vivo - DólarGT",
+    template: "%s | DólarGT - Tipo de Cambio Guatemala",
+  },
   description:
-    "Consulta el tipo de cambio del dólar a quetzal guatemalteco en tiempo real. Gráficos históricos, análisis y conversor de moneda. Tasa de cambio actualizada de bancos de Guatemala.",
+    "Consulta el tipo de cambio dólar a quetzal guatemalteco en tiempo real. Precios actualizados de bancos, gráficos históricos, conversor de moneda y análisis de tendencias. Tasa de cambio USD a GTQ hoy.",
   keywords: [
-    "tipo de cambio",
+    "tipo de cambio dólar a quetzal guatemalteco",
     "dólar a quetzal",
     "USD GTQ",
-    "Guatemala",
-    "banco",
+    "tipo de cambio guatemala",
+    "precio del dólar en guatemala",
+    "banco de guatemala",
     "tasa de cambio",
     "conversor de moneda",
-    "precio del dólar",
+    "dolar hoy",
+    "quetzal a dolar",
+    "cambio de moneda guatemala",
+    "banguat",
+    "dolar gt",
+    "tasa de cambio hoy",
+    "precio del dolar",
+    "banco industrial",
+    "banco g&t continental",
+    "banco agricola",
+    "banco de occidente",
   ],
   authors: [{ name: "Dollar GT" }],
   creator: "Dollar GT",
@@ -41,24 +54,27 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://dolar.luislocon.dev"),
   alternates: {
     canonical: "/",
+    languages: {
+      "es-GT": "/",
+    },
   },
   openGraph: {
-    title:
-      "DólarGT - Guatemala - Rastreador de Precio | Tipo de Cambio USD a GTQ en Vivo",
+    title: "Tipo de Cambio Dólar a Quetzal Guatemalteco | Precios en Vivo - DólarGT",
     description:
-      "Consulta el tipo de cambio del dólar a quetzal guatemalteco en tiempo real. Gráficos históricos, análisis y conversor de moneda.",
+      "Consulta el tipo de cambio dólar a quetzal guatemalteco en tiempo real. Precios actualizados de bancos, gráficos históricos y conversor de moneda.",
     url: "https://dolar.luislocon.dev",
-    siteName: "Dollar GT",
+    siteName: "DólarGT",
     locale: "es_GT",
     type: "website",
+    countryName: "Guatemala",
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "DólarGT - Guatemala - Rastreador de Precio | Tipo de Cambio USD a GTQ en Vivo",
+    title: "Tipo de Cambio Dólar a Quetzal Guatemalteco | Precios en Vivo",
     description:
-      "Consulta el tipo de cambio del dólar a quetzal guatemalteco en tiempo real. Gráficos históricos y análisis.",
+      "Consulta el tipo de cambio dólar a quetzal guatemalteco en tiempo real. Precios actualizados de bancos y gráficos históricos.",
     creator: "@dollargt",
+    site: "@dollargt",
   },
   icons: {
     icon: "/favicon.ico",

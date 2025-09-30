@@ -93,7 +93,7 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
                 value={selectedExchangeRate || internalSelectedRate}
                 onValueChange={handleExchangeRateChange}
               >
-                <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectTrigger className="w-full sm:w-[280px]">
                   <SelectValue placeholder="Seleccionar tasa de cambio" />
                 </SelectTrigger>
                 <SelectContent>
@@ -112,10 +112,7 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
                 </SelectContent>
               </Select>
             )}
-            <div className="text-sm text-muted-foreground">
-              1 USD = {currentRate.toFixed(5)} GTQ
             </div>
-          </div>
         </div>
       </GlassCardHeader>
       <GlassCardContent>
