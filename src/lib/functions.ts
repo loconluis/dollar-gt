@@ -33,7 +33,6 @@ export const getDollarValueByBinaceP2PType = async ({
       currencyFiat: data?.data[0]?.adv?.fiatSymbol,
       operation,
     };
-    console.log("Binance " + operation + " VD: ", data?.data[0]?.adv?.price);
     return returnData;
   } catch (e) {
     throw new Error("Unable to fetch data from P2P of Binance " + e);
@@ -41,17 +40,15 @@ export const getDollarValueByBinaceP2PType = async ({
 };
 
 export const getDollarByOsmoScrap = async () => {
-  const res = await fetch(
-    "https://ayuda.osmowallet.com/es/articles/7437528-compra-y-vende-usdt-usdc"
+  await fetch(
+    "https://ayuda.osmowallet.com/es/articles/7437528-compra-y-vende-usdt-usdc",
   );
-
-  console.log(await res.text());
 };
 
 export const getBitcoinValue = async () => {
   // Use coindesk data
   const { data } = await axios.get(
-    "https://api.coindesk.com/v1/bpi/currentprice/GTQ.json"
+    "https://api.coindesk.com/v1/bpi/currentprice/GTQ.json",
   );
   const obj = {
     platform: "Coindesk",
@@ -61,7 +58,6 @@ export const getBitcoinValue = async () => {
       data.disclaimer +
       '\n Ver <a href="https://www.coindesk.com/" target="_blank">Coindesk</a>',
   };
-  console.log("BTC VD: ", data.bpi.GTQ.rate);
   return obj;
 };
 
@@ -75,7 +71,7 @@ export const call = async () => {
 };
 
 export const getLast30DaysOfDolarValueOfficialRecords = async (
-  date: string
+  date: string,
 ) => {
   try {
     if (!date.length) {
@@ -113,4 +109,9 @@ export const getLast30DaysOfDolarValueOfficialRecords = async (
   } catch (e) {
     throw new Error("Unable to retrieve data from Banco de Guatemala " + e);
   }
+};
+
+export const getDataBank = async () => {
+  const { data } = await axios.get("https://dolar-api.luislocon.dev/data-bank");
+  return data;
 };

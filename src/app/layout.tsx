@@ -15,9 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Dolar y BTC en Guatemala",
-  description:
-    "Un lugar para ver valores representativos del precio del Dolar y Bitcoin en Guatemala",
+  title: "Dollar Price Tracker - Guatemala",
+  description: "Real-time USD to GTQ exchange rate tracking with charts and analytics",
 };
 
 export default function RootLayout({
@@ -26,11 +25,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange={false}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
