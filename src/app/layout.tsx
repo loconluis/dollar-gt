@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from "@vercel/analytics/next";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -62,9 +63,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
-    apple: [
-      { url: "/icon.png", sizes: "100x100", type: "image/png" },
-    ],
+    apple: [{ url: "/icon.png", sizes: "100x100", type: "image/png" }],
     other: [
       { url: "/icon.png", sizes: "100x100", type: "image/png" },
       {
@@ -109,6 +108,7 @@ export default function RootLayout({
           disableTransitionOnChange={false}
         >
           {children}
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
