@@ -96,18 +96,18 @@ export function ModernDollarTracker() {
   // Calculate best BUY (highest) and SELL (lowest) values
   const bestBuyValue =
     exchangeData.length > 0
-      ? Math.max(...exchangeData.map((item) => parseFloat(item.buy || 0)))
+      ? Math.max(...exchangeData.map((item) => typeof item.buy === 'string' ? parseFloat(item.buy) : item.buy || 0))
       : 0;
   const bestSellValue =
     exchangeData.length > 0
-      ? Math.min(...exchangeData.map((item) => parseFloat(item.sell || 0)))
+      ? Math.min(...exchangeData.map((item) => typeof item.sell === 'string' ? parseFloat(item.sell) : item.sell || 0))
       : 0;
 
   // Format exchangeData for CurrencyConverter with unique IDs
   const formattedExchangeRates = exchangeData.map((item, index) => ({
     id: `${item.name.toLowerCase().replace(/\s+/g, '-')}-${index}`,
     name: item.name,
-    rate: parseFloat(item.buy || 0),
+    rate: typeof item.buy === 'string' ? parseFloat(item.buy) : item.buy || 0,
     description: item.is_online ? "Ventanilla Virtual" : "Banco tradicional",
     is_online: item.is_online,
   }));
@@ -407,9 +407,9 @@ export function ModernDollarTracker() {
                           <TableRow
                             key={item.name + "_" + index}
                             className={cn(
-                              parseFloat(item.buy || 0) === bestBuyValue &&
+                              (typeof item.buy === 'string' ? parseFloat(item.buy) : item.buy || 0) === bestBuyValue &&
                                 "border-l-4 border-l-green-500",
-                              parseFloat(item.sell || 0) === bestSellValue &&
+                              (typeof item.sell === 'string' ? parseFloat(item.sell) : item.sell || 0) === bestSellValue &&
                                 "border-r-4 border-r-blue-500",
                             )}
                           >
@@ -429,10 +429,10 @@ export function ModernDollarTracker() {
                               </div>
                             </TableCell>
                             <TableCell className="text-right font-medium">
-                              {parseFloat(item.buy || 0).toFixed(2)}
+                              {(typeof item.buy === 'string' ? parseFloat(item.buy) : item.buy || 0).toFixed(2)}
                             </TableCell>
                             <TableCell className="text-right font-medium">
-                              {parseFloat(item.sell || 0).toFixed(2)}
+                              {(typeof item.sell === 'string' ? parseFloat(item.sell) : item.sell || 0).toFixed(2)}
                             </TableCell>
                             <TableCell className="text-right">
                               <span
