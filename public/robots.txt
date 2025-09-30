@@ -1,10 +1,31 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://dolar.luislocon.dev/sitemap.xml
-
-# Block common bot paths
+# Block bot paths
 Disallow: /api/
 Disallow: /_next/
 Disallow: /fonts/
+Disallow: /*.json$
+
+# Crawl delay for good bot behavior
+Crawl-delay: 1
+
+# Allow specific bots with enhanced crawling
+User-agent: Googlebot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Sitemap
+Sitemap: https://dolar.luislocon.dev/sitemap.xml
+
+# Geographic targeting
+# Targeting Guatemala primarily
+# Spanish language targeting
