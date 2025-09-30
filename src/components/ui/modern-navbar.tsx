@@ -40,12 +40,12 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
 
   const defaultNavItems: NavItem[] = [
     {
-      label: "Disclaimer",
+      label: "Descargo de Responsabilidad",
       icon: <Info className="w-4 h-4" />,
       onClick: () => {},
     },
     {
-      label: "Author",
+      label: "Autor",
       icon: <User className="w-4 h-4" />,
       onClick: () => {},
     },
@@ -132,7 +132,7 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                {item.label === "Disclaimer" ? (
+                {item.label === "Descargo de Responsabilidad" ? (
                   <Dialog>
                     <DialogTrigger asChild>
                       <NavItemComponent {...item} />
@@ -141,23 +141,23 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
                       <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                           <Info className="w-5 h-5" />
-                          Disclaimer
+                          Descargo de Responsabilidad
                         </DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 text-sm text-muted-foreground">
                         <p>
-                          This application provides information about the exchange rate history of the US dollar in Guatemala over the last 30 days. Data is provided by the Bank of Guatemala.
+                          Esta aplicación proporciona información sobre el historial del tipo de cambio del dólar estadounidense en Guatemala durante los últimos 30 días. Los datos son proporcionados por el Banco de Guatemala.
                         </p>
                         <p>
-                          While we strive to provide accurate and up-to-date information, we do not guarantee the accuracy, completeness, or timeliness of the information presented. Exchange rates may vary and depend on multiple factors.
+                          Si bien nos esforzamos por proporcionar información precisa y actualizada, no garantizamos la exactitud, integridad o puntualidad de la información presentada. Los tipos de cambio pueden variar y dependen de múltiples factores.
                         </p>
                         <p>
-                          This application should not be considered as financial advice. We recommend consulting with a professional before making financial decisions based on the information presented here.
+                          Esta aplicación no debe considerarse como asesoramiento financiero. Recomendamos consultar con un profesional antes de tomar decisiones financieras basadas en la información presentada aquí.
                         </p>
                       </div>
                     </DialogContent>
                   </Dialog>
-                ) : item.label === "Author" ? (
+                ) : item.label === "Autor" ? (
                   <Dialog>
                     <DialogTrigger asChild>
                       <NavItemComponent {...item} />
@@ -166,16 +166,16 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
                       <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                           <User className="w-5 h-5" />
-                          Author Information
+                          Información del Autor
                         </DialogTitle>
                       </DialogHeader>
                       <div className="space-y-3">
                         <div>
-                          <p className="text-sm text-muted-foreground">Created by</p>
+                          <p className="text-sm text-muted-foreground">Creado por</p>
                           <p className="font-medium">Luis Locon</p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">Contact</p>
+                          <p className="text-sm text-muted-foreground">Contacto</p>
                           <a
                             href="https://x.com/loconluis"
                             target="_blank"
@@ -186,7 +186,7 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
                           </a>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">Source Code</p>
+                          <p className="text-sm text-muted-foreground">Código Fuente</p>
                           <a
                             href="https://github.com/dollar-gt"
                             target="_blank"

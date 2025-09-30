@@ -1,37 +1,9 @@
+import { IExchange } from "@/interfaces";
 import { useEffect, useState } from "react";
 
-const defaultValues = [
-  {
-    platform: "Banco de Guatemala",
-    dollarValue: "",
-    info: "Este es el valor oficial del Banco de Guatemala",
-  },
-  {
-    platform: "Binance",
-    dollarValue: "",
-    info: "Binance es una exchange de Cryptomonedas donde puedes comprar en muchas formas una de ellas es P2P",
-    currencyFiat: "Q",
-    operation: "BUY",
-  },
-  {
-    platform: "Binance",
-    dollarValue: "",
-    info: "Binance es una exchange de Cryptomonedas donde puedes comprar en muchas formas una de ellas es P2P",
-    currencyFiat: "Q",
-    operation: "SELL",
-  },
-  {
-    platform: "Coindesk",
-    USDPrice: "",
-    GTQPrice: "",
-    info: "This data was produced from the CoinDesk Bitcoin Price Index (USD). Non-USD currency data converted using hourly conversion rate from openexchangerates.org",
-  },
-];
-
-export const useFetchData = () => {
-  const [data, setData] = useState(defaultValues);
+export const useFetchExchange = () => {
+  const [exchangeData, setData] = useState<IExchange[]>([]);
   const [loading, setLoading] = useState(false);
-  const [refresh, setRefresh] = useState<number>(0);
 
   useEffect(() => {
     setLoading(true);
@@ -42,15 +14,9 @@ export const useFetchData = () => {
       setLoading(false);
     };
     call();
-  }, [refresh]);
+  }, []);
 
-  const handleRefresh = () => {
-    setRefresh((prevState) => {
-      return prevState + 1;
-    });
-  };
-
-  return { data, loading, handleRefresh };
+  return { exchangeData, loadingExchange: loading };
 };
 
 export const use30DaysData = (date: string) => {

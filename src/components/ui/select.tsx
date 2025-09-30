@@ -84,7 +84,7 @@ const SelectContent: React.FC<{ children: React.ReactNode; isOpen?: boolean }> =
 
   return (
     <div className="absolute top-full z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
-      <div className="p-1">{children}</div>
+      <div className="p-1 max-h-60 overflow-y-auto">{children}</div>
     </div>
   );
 };

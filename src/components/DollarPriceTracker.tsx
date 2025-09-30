@@ -60,8 +60,6 @@ export function DollarPriceTracker() {
   const [gtqAmount, setGtqAmount] = useState("");
   const [usdAmount, setUsdAmount] = useState("");
   const { data, loading } = use30DaysData(getToday());
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  console.log("Data", data);
   const dateForQuery = new Date();
 
   const calculateStats = (data: FormattedHistoricObject[]) => {

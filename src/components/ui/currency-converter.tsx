@@ -14,6 +14,7 @@ interface ExchangeRateOption {
   name: string;
   rate: number;
   description: string;
+  is_online?: boolean;
 }
 
 interface CurrencyConverterProps {
@@ -98,7 +99,14 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
                 <SelectContent>
                   {exchangeRates.map((rate) => (
                     <SelectItem key={rate.id} value={rate.id}>
-                      {rate.name}
+                      <div className="flex items-center gap-2">
+                        <span>{rate.name}</span>
+                        {rate.is_online && (
+                          <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                            Virtual
+                          </span>
+                        )}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>

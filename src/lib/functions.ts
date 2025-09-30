@@ -41,14 +41,14 @@ export const getDollarValueByBinaceP2PType = async ({
 
 export const getDollarByOsmoScrap = async () => {
   await fetch(
-    "https://ayuda.osmowallet.com/es/articles/7437528-compra-y-vende-usdt-usdc"
+    "https://ayuda.osmowallet.com/es/articles/7437528-compra-y-vende-usdt-usdc",
   );
 };
 
 export const getBitcoinValue = async () => {
   // Use coindesk data
   const { data } = await axios.get(
-    "https://api.coindesk.com/v1/bpi/currentprice/GTQ.json"
+    "https://api.coindesk.com/v1/bpi/currentprice/GTQ.json",
   );
   const obj = {
     platform: "Coindesk",
@@ -71,7 +71,7 @@ export const call = async () => {
 };
 
 export const getLast30DaysOfDolarValueOfficialRecords = async (
-  date: string
+  date: string,
 ) => {
   try {
     if (!date.length) {
@@ -109,4 +109,9 @@ export const getLast30DaysOfDolarValueOfficialRecords = async (
   } catch (e) {
     throw new Error("Unable to retrieve data from Banco de Guatemala " + e);
   }
+};
+
+export const getDataBank = async () => {
+  const { data } = await axios.get("https://dolar-api.luislocon.dev/data-bank");
+  return data;
 };
