@@ -22,6 +22,10 @@ interface NavItem {
   isExternal?: boolean;
 }
 
+interface NavItemComponentProps extends NavItem {
+  isMobileMenu?: boolean;
+}
+
 interface ModernNavbarProps {
   className?: string;
   items?: NavItem[];
@@ -63,12 +67,13 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
-  const NavItemComponent: React.FC<NavItem> = ({
+  const NavItemComponent: React.FC<NavItemComponentProps> = ({
     label,
     icon,
     onClick,
     href,
     isExternal,
+    isMobileMenu = false,
   }) => {
     const content = (
       <motion.button
@@ -81,7 +86,10 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
         onClick={onClick}
       >
         {icon}
-        <span className="text-sm font-medium hidden sm:inline">{label}</span>
+        <span className={cn(
+          "text-sm font-medium",
+          !isMobileMenu && "hidden sm:inline"
+        )}>{label}</span>
       </motion.button>
     );
 
@@ -109,17 +117,17 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
         className
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1.5 sm:gap-2"
           >
-            <DollarSign className="w-6 h-6 text-primary" />
-            <span className="text-lg font-semibold tracking-tight">
-              Dólar en Guatemala
+            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+            <span className="text-sm sm:text-base lg:text-lg font-semibold tracking-tight">
+              Dólar GT
             </span>
           </motion.div>
 
@@ -135,7 +143,7 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
                 {item.label === "Descargo de Responsabilidad" ? (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <NavItemComponent {...item} />
+                      <NavItemComponent {...item} isMobileMenu={false} />
                     </DialogTrigger>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
@@ -160,7 +168,7 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
                 ) : item.label === "Autor" ? (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <NavItemComponent {...item} />
+                      <NavItemComponent {...item} isMobileMenu={false} />
                     </DialogTrigger>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
@@ -200,7 +208,7 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
                     </DialogContent>
                   </Dialog>
                 ) : (
-                  <NavItemComponent {...item} />
+                  <NavItemComponent {...item} isMobileMenu={false} />
                 )}
               </motion.div>
             ))}
@@ -262,7 +270,76 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({ className, items = [] }) =>
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <NavItemComponent {...item} />
+                    {item.label === "Descargo de Responsabilidad" ? (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <NavItemComponent {...item} isMobileMenu={true} />
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Info className="w-5 h-5" />
+                              Descargo de Responsabilidad
+                            </DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4 text-sm text-muted-foreground">
+                            <p>
+                              Esta aplicación proporciona información sobre el historial del tipo de cambio del dólar estadounidense en Guatemala durante los últimos 30 días. Los datos son proporcionados por el Banco de Guatemala.
+                            </p>
+                            <p>
+                              Si bien nos esforzamos por proporcionar información precisa y actualizada, no garantizamos la exactitud, integridad o puntualidad de la información presentada. Los tipos de cambio pueden variar y dependen de múltiples factores.
+                            </p>
+                            <p>
+                              Esta aplicación no debe considerarse como asesoramiento financiero. Recomendamos consultar con un profesional antes de tomar decisiones financieras basadas en la información presentada aquí.
+                            </p>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    ) : item.label === "Autor" ? (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <NavItemComponent {...item} isMobileMenu={true} />
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <User className="w-5 h-5" />
+                              Información del Autor
+                            </DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-3">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Creado por</p>
+                              <p className="font-medium">Luis Locon</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Contacto</p>
+                              <a
+                                href="https://x.com/loconluis"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                @LoconLuis
+                              </a>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Código Fuente</p>
+                              <a
+                                href="https://github.com/dollar-gt"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                github.com/dollar-gt
+                              </a>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    ) : (
+                      <NavItemComponent {...item} isMobileMenu={true} />
+                    )}
                   </motion.div>
                 ))}
                 <motion.div

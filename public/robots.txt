@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://dolar.luislocon.dev/sitemap.xml
+
+# Block common bot paths
+Disallow: /api/
+Disallow: /_next/
+Disallow: /fonts/
