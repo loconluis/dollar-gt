@@ -634,8 +634,8 @@ export function ModernDollarTracker() {
               className="mb-6 sm:mb-12"
             >
               <GlassCard variant="elevated">
-                <GlassCardHeader>
-                  <div className="flex flex-col gap-4 relative z-10">
+                <GlassCardHeader className="relative z-30">
+                  <div className="flex flex-col gap-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <h3
                         id="tasas-bancos-heading"
@@ -656,16 +656,16 @@ export function ModernDollarTracker() {
                       </div>
                     </div>
 
-                    {/* Filter Tabs */}
-                    <div className="flex flex-col gap-3">
-                      <div className="flex flex-wrap gap-1 sm:gap-2 pointer-events-auto">
+                    {/* Filter Tabs - Fixed z-index and pointer-events */}
+                    <div className="flex flex-col gap-3 pointer-events-auto">
+                      <div className="flex flex-wrap gap-1 sm:gap-2">
                         <button
                           type="button"
                           onClick={() => {
                             console.log("Setting filter to all");
                             setFilterType("all");
                           }}
-                          className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 hover:scale-105 active:scale-95 relative z-20 ${
+                          className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 hover:scale-105 active:scale-95 relative z-50 ${
                             filterType === "all"
                               ? "bg-primary text-primary-foreground shadow-lg"
                               : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm"
@@ -679,7 +679,7 @@ export function ModernDollarTracker() {
                             console.log("Setting filter to online");
                             setFilterType("online");
                           }}
-                          className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 hover:scale-105 active:scale-95 relative z-20 ${
+                          className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 hover:scale-105 active:scale-95 relative z-50 ${
                             filterType === "online"
                               ? "bg-primary text-primary-foreground shadow-lg"
                               : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm"
@@ -698,7 +698,7 @@ export function ModernDollarTracker() {
                             console.log("Setting filter to agencies");
                             setFilterType("agencies");
                           }}
-                          className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 hover:scale-105 active:scale-95 relative z-20 ${
+                          className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 hover:scale-105 active:scale-95 relative z-50 ${
                             filterType === "agencies"
                               ? "bg-primary text-primary-foreground shadow-lg"
                               : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm"
