@@ -1,3 +1,16 @@
+# Single-package workspace declaration. pnpm 9 (used by Vercel) errors
+# with "packages field missing or empty" if this file exists without a
+# packages field, so the root package is declared explicitly.
+packages:
+  - "."
+
+# pnpm 10/11 read this list; pnpm 9 runs dependency builds by default
+# and ignores it.
+onlyBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
+# pnpm 12 renamed the setting to a map; older versions ignore it.
 allowBuilds:
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
+  sharp: true
+  unrs-resolver: true
