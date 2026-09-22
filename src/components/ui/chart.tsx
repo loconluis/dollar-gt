@@ -15,7 +15,7 @@ import {
   Bar,
   BarChart,
 } from "recharts";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface ChartContainerProps {
@@ -55,7 +55,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="rounded-lg border border-border/50 bg-background/95 backdrop-blur-sm p-4 shadow-xl"
+      className="rounded-lg border border-border bg-popover p-4 shadow-xl"
     >
       <p className="text-sm font-medium text-muted-foreground mb-2">{label}</p>
       {payload.map((entry, index) => (
@@ -93,9 +93,14 @@ const TrendChart: React.FC<TrendChartProps> = ({
   className,
   height,
   showArea = true,
-  color = "hsl(var(--primary))",
+  color = "hsl(var(--chart-1))",
 }) => {
+  const reduce = useReducedMotion();
   const ChartComponent = showArea ? AreaChart : LineChart;
+  const monoTick = {
+    fontSize: 11,
+    fontFamily: "var(--font-geist-mono), ui-monospace, monospace",
+  };
 
   return (
     <ChartContainer className={className} height={height}>
@@ -122,6 +127,7 @@ const TrendChart: React.FC<TrendChartProps> = ({
         <XAxis
           dataKey={xAxisKey}
           className="text-muted-foreground text-xs"
+          tick={monoTick}
           tickLine={false}
           axisLine={false}
           padding={{ left: 20, right: 20 }}
@@ -129,6 +135,7 @@ const TrendChart: React.FC<TrendChartProps> = ({
         <YAxis
           dataKey={dataKey}
           className="text-muted-foreground text-xs"
+          tick={monoTick}
           tickLine={false}
           axisLine={false}
           domain={["dataMin - 0.1", "dataMax + 0.1"]}
@@ -143,6 +150,8 @@ const TrendChart: React.FC<TrendChartProps> = ({
             strokeWidth={2}
             fill={`url(#gradient-${dataKey})`}
             dot={false}
+            isAnimationActive={!reduce}
+            animationDuration={900}
             activeDot={{
               r: 4,
               fill: color,
@@ -157,6 +166,7 @@ const TrendChart: React.FC<TrendChartProps> = ({
             stroke={color}
             strokeWidth={2}
             dot={false}
+            isAnimationActive={!reduce}
             activeDot={{
               r: 4,
               fill: color,
@@ -185,7 +195,7 @@ const ModernBarChart: React.FC<BarChartProps> = ({
   xAxisKey,
   className,
   height,
-  color = "hsl(var(--primary))",
+  color = "hsl(var(--chart-1))",
 }) => (
   <ChartContainer className={className} height={height}>
     <BarChart data={data}>
@@ -241,7 +251,7 @@ const Sparkline: React.FC<SparklineProps> = ({
   className,
   width = 120,
   height = 40,
-  color = "hsl(var(--primary))",
+  color = "hsl(var(--chart-1))",
   showMinMax = false,
 }) => {
   const chartData = data.map((value, index) => ({ value, index }));

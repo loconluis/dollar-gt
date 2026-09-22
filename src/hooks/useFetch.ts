@@ -1,12 +1,14 @@
 import { IExchange } from "@/interfaces";
 import { useEffect, useState } from "react";
 
-export const useFetchExchange = () => {
-  const [exchangeData, setData] = useState<IExchange[]>([]);
-  const [loading, setLoading] = useState(false);
+export const useFetchExchange = (seed?: IExchange[]) => {
+  const [exchangeData, setData] = useState<IExchange[]>(seed ?? []);
+  const [loading, setLoading] = useState(!seed || seed.length === 0);
 
   useEffect(() => {
-    setLoading(true);
+    // Server-rendered pages pass a seed; only fall back to a client
+    // fetch when the server could not produce rates.
+    if (seed && seed.length > 0) return;
     const call = async () => {
       const res = await fetch("/api/exchange");
       const _data = await res.json();
@@ -14,25 +16,7 @@ export const useFetchExchange = () => {
       setLoading(false);
     };
     call();
-  }, []);
+  }, [seed]);
 
   return { exchangeData, loadingExchange: loading };
-};
-
-export const use30DaysData = (date: string) => {
-  const [data, setData] = useState([{ fecha: "", precio: "" }]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const call = async () => {
-      const res = await fetch(`/api/historic?date=${date}`);
-      const _data = await res.json();
-      setData(() => [..._data?.data]);
-      setLoading(false);
-    };
-    setLoading(true);
-    call();
-  }, [date]);
-
-  return { data, loading };
 };

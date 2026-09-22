@@ -120,7 +120,6 @@ const fetchLast30DaysFromBanguat = async (date: string) => {
     if (!xml2JSON.length) {
       const pivot = xml2JSON.Vars.children;
       const formattedPivot = parseDataForLegibleIn30DayRange(pivot);
-      console.info(JSON.stringify(formattedPivot));
       return formattedPivot;
     }
 
