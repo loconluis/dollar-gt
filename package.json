@@ -2,6 +2,9 @@
   "name": "dollar-gt",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "dev:network": "next dev --hostname 0.0.0.0",
