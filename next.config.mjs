@@ -9,6 +9,58 @@ const nextConfig = {
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  // SEO landing paths listed in sitemap.ts and SEOFooter — serve the main
+  // tracker page until dedicated pages exist (avoids 404s on indexed URLs).
+  rewrites: async () => [
+    {
+      source: '/tipo-de-cambio-dolar-quetzal',
+      destination: '/',
+    },
+    {
+      source: '/dolar-hoy-guatemala',
+      destination: '/',
+    },
+    {
+      source: '/precio-dolar-gtq',
+      destination: '/',
+    },
+    {
+      source: '/banco-guatemala-tipo-cambio',
+      destination: '/',
+    },
+    {
+      source: '/conversor-dolar-quetzal',
+      destination: '/',
+    },
+    {
+      source: '/tasas-cambio-bancos-guatemala',
+      destination: '/',
+    },
+    {
+      source: '/historial-dolar-quetzal',
+      destination: '/',
+    },
+    {
+      source: '/mejor-tasa-dolar-guatemala',
+      destination: '/',
+    },
+    {
+      source: '/banguat-dolar-hoy',
+      destination: '/',
+    },
+    {
+      source: '/cambio-moneda-guatemala',
+      destination: '/',
+    },
+    {
+      source: '/tasa-cambio/:bank',
+      destination: '/',
+    },
+    {
+      source: '/tipo-cambio/:location',
+      destination: '/',
+    },
+  ],
   headers: async () => [
     {
       source: '/api/:path*',

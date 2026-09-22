@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DólarGT 💵
 
-## Getting Started
+Real-time USD → GTQ (US Dollar to Guatemalan Quetzal) exchange rate tracker. Pulls buy/sell rates from Guatemalan banks, shows a 30-day historic chart from Banco de Guatemala, and includes a currency converter.
 
-First, run the development server:
+Live at: https://dolar.luislocon.dev
+
+## Stack
+
+- Next.js 15 (App Router) + TypeScript
+- Tailwind CSS + shadcn/ui components
+- Recharts (historic chart), Framer Motion (animations)
+- pnpm
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command       | Description                  |
+| ------------- | ---------------------------- |
+| `pnpm dev`    | Start the dev server         |
+| `pnpm build`  | Production build             |
+| `pnpm start`  | Serve the production build   |
+| `pnpm lint`   | Run ESLint                   |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project structure
 
-## Learn More
+```
+src/
+├── app/
+│   ├── api/exchange/route.ts   # Live bank rates (cached 60s via headers)
+│   ├── api/historic/route.ts   # 30-day historic rates (Banco de Guatemala)
+│   ├── sitemap.ts              # SEO sitemap
+│   └── page.tsx                # Main tracker page
+├── components/
+│   ├── ModernDollarTracker.tsx # Main page component
+│   ├── StructuredData.tsx      # JSON-LD structured data
+│   ├── LocalSEO.tsx / SEOFooter.tsx
+│   └── ui/                     # shadcn/ui primitives
+└── hooks/useFetch.ts           # Data fetching hooks
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- SEO landing paths listed in `sitemap.ts` (e.g. `/dolar-hoy-guatemala`,
+  `/tasa-cambio/:bank`) are rewritten to `/` in `next.config.mjs` until
+  dedicated pages exist.
+- Build script approvals for `sharp` / `unrs-resolver` are recorded in
+  `pnpm-workspace.yaml` (`allowBuilds`).
