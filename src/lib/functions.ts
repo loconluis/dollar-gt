@@ -6,6 +6,17 @@ import {
   substract30DaysFromDate,
 } from "./utils";
 import { constant } from "@/constants";
+import { getCached } from "./cache";
+
+// Live bank rates change often: fresh for 60s, servable stale for 5min
+// while a single background refresh runs (matches the CDN s-maxage=60).
+const EXCHANGE_TTL_MS = 60_000;
+const EXCHANGE_STALE_MS = 5 * 60_000;
+
+// Banguat's 30-day historic series updates at most daily: fresh for 30min,
+// servable stale for 6h. Keyed per requested date.
+const HISTORIC_TTL_MS = 30 * 60_000;
+const HISTORIC_STALE_MS = 6 * 60 * 60_000;
 
 export const getDollarValueByBinaceP2PType = async ({
   asset = "USDT",
@@ -73,10 +84,18 @@ export const call = async () => {
 export const getLast30DaysOfDolarValueOfficialRecords = async (
   date: string,
 ) => {
+  if (!date?.length) {
+    throw new Error("Date is a required parameter");
+  }
+  return getCached(
+    `historic:30d:${date}`,
+    () => fetchLast30DaysFromBanguat(date),
+    { ttlMs: HISTORIC_TTL_MS, staleMs: HISTORIC_STALE_MS },
+  );
+};
+
+const fetchLast30DaysFromBanguat = async (date: string) => {
   try {
-    if (!date.length) {
-      throw new Error("Date is a required parameter");
-    }
     const pastDay = substract30DaysFromDate(date);
     const uri = `${constant.BANC_GT_URI}${constant.BANC_GT_TIPO_CAMBIO}`;
     const soapReq = `
@@ -112,6 +131,14 @@ export const getLast30DaysOfDolarValueOfficialRecords = async (
 };
 
 export const getDataBank = async () => {
-  const { data } = await axios.get("https://dolar-api.luislocon.dev/data-bank");
-  return data;
+  return getCached(
+    "exchange:data-bank",
+    async () => {
+      const { data } = await axios.get(
+        "https://dolar-api.luislocon.dev/data-bank",
+      );
+      return data;
+    },
+    { ttlMs: EXCHANGE_TTL_MS, staleMs: EXCHANGE_STALE_MS },
+  );
 };
