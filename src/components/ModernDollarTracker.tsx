@@ -132,13 +132,18 @@ export function ModernDollarTracker({
       : 0;
 
   // Format exchangeData for CurrencyConverter with unique IDs
-  const formattedExchangeRates = exchangeData.map((item, index) => ({
-    id: `${item.name.toLowerCase().replace(/\s+/g, "-")}-${index}`,
-    name: item.name,
-    rate: typeof item.buy === "string" ? parseFloat(item.buy) : item.buy || 0,
-    description: item.is_online ? "Ventanilla Virtual" : "Banco tradicional",
-    is_online: item.is_online,
-  }));
+  const formattedExchangeRates = React.useMemo(
+    () =>
+      exchangeData.map((item, index) => ({
+        id: `${item.name.toLowerCase().replace(/\s+/g, "-")}-${index}`,
+        name: item.name,
+        rate:
+          typeof item.buy === "string" ? parseFloat(item.buy) : item.buy || 0,
+        description: item.is_online ? "Ventanilla Virtual" : "Banco tradicional",
+        is_online: item.is_online,
+      })),
+    [exchangeData],
+  );
 
   // Handle sorting
   const handleSort = (field: SortField) => {
@@ -232,21 +237,18 @@ export function ModernDollarTracker({
     return bestExchange ? cleanBankName(bestExchange.name) : "No disponible";
   };
 
-  // Set default exchange rate when data loads (prioritize Banco de Guatemala)
-  React.useEffect(() => {
-    if (formattedExchangeRates.length > 0 && !selectedExchangeRate) {
-      const bancoGuatemala = formattedExchangeRates.find(
-        (rate) =>
-          rate.name.toLowerCase().includes("banco de guatemala") ||
-          rate.name.toLowerCase().includes("banguat"),
-      );
-      if (bancoGuatemala) {
-        setSelectedExchangeRate(bancoGuatemala.id);
-      } else {
-        setSelectedExchangeRate(formattedExchangeRates[0].id);
-      }
-    }
-  }, [formattedExchangeRates, selectedExchangeRate]);
+  // Default rate (Banco de Guatemala first) is derived during render,
+  // not synced in an effect: the seed data arrives as props, so the
+  // first render already knows the answer.
+  const defaultExchangeRateId = React.useMemo(() => {
+    const bancoGuatemala = formattedExchangeRates.find(
+      (rate) =>
+        rate.name.toLowerCase().includes("banco de guatemala") ||
+        rate.name.toLowerCase().includes("banguat"),
+    );
+    return bancoGuatemala?.id ?? formattedExchangeRates[0]?.id ?? "";
+  }, [formattedExchangeRates]);
+  const effectiveExchangeRate = selectedExchangeRate || defaultExchangeRateId;
 
   if (!data.length || (data.length === 1 && !data[0].precio)) {
     return (
@@ -763,7 +765,7 @@ export function ModernDollarTracker({
                 <CurrencyConverter
                   exchangeRate={currentPrice}
                   exchangeRates={formattedExchangeRates}
-                  selectedExchangeRate={selectedExchangeRate}
+                  selectedExchangeRate={effectiveExchangeRate}
                   onExchangeRateChange={setSelectedExchangeRate}
                 />
               </SurfaceContent>

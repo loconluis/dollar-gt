@@ -12,6 +12,8 @@ interface AnimatedNumberProps {
 /**
  * Tweens between numeric values when live data changes.
  * Reduced-motion users get the final value immediately.
+ * The from-value lives in a ref that is only written inside the
+ * animation callback, never during render.
  */
 export function AnimatedNumber({
   value,
@@ -21,20 +23,25 @@ export function AnimatedNumber({
   const reduce = useReducedMotion();
   const [display, setDisplay] = React.useState(value);
   const displayRef = React.useRef(value);
-  displayRef.current = display;
 
   React.useEffect(() => {
     if (reduce) {
-      setDisplay(value);
       return;
     }
     const controls = animate(displayRef.current, value, {
       duration: 0.6,
       ease: "easeOut",
-      onUpdate: (v) => setDisplay(v),
+      onUpdate: (v) => {
+        displayRef.current = v;
+        setDisplay(v);
+      },
     });
     return () => controls.stop();
   }, [value, reduce]);
+
+  if (reduce) {
+    return <span className={className}>{value.toFixed(decimals)}</span>;
+  }
 
   return <span className={className}>{display.toFixed(decimals)}</span>;
 }

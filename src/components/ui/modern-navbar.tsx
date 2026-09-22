@@ -101,12 +101,14 @@ const ModernNavbar: React.FC<ModernNavbarProps> = ({
   items = [],
 }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
+  // Mount detection without setState-in-effect: false on the server
+  // render, true once hydrated, so theme-dependent UI never mismatches.
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const { theme, setTheme } = useTheme();
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted) return null;
 
