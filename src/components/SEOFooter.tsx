@@ -1,6 +1,3 @@
-"use client";
-
-import Link from "next/link";
 import { Building2, TrendingUp, Globe, Calculator, Clock } from "lucide-react";
 
 export function SEOFooter() {
@@ -10,25 +7,26 @@ export function SEOFooter() {
     {
       href: "#tasas-bancos-heading",
       label: "Tasas de Cambio",
-      icon: <Building2 className="w-4 h-4" />,
+      icon: <Building2 className="h-4 w-4" aria-hidden="true" />,
     },
     {
       href: "#conversor-moneda-heading",
       label: "Conversor USD/GTQ",
-      icon: <Calculator className="w-4 h-4" />,
+      icon: <Calculator className="h-4 w-4" aria-hidden="true" />,
     },
     {
       href: "#graficos-analisis-heading",
       label: "Gráficos Históricos",
-      icon: <TrendingUp className="w-4 h-4" />,
+      icon: <TrendingUp className="h-4 w-4" aria-hidden="true" />,
     },
     {
       href: "#mejores-tasas-heading",
       label: "Mejores Tasas",
-      icon: <TrendingUp className="w-4 h-4" />,
+      icon: <TrendingUp className="h-4 w-4" aria-hidden="true" />,
     },
   ];
 
+  // These paths resolve to the main tracker page via rewrites in next.config.mjs.
   const relatedPages = [
     {
       href: "/tipo-de-cambio-dolar-quetzal",
@@ -42,22 +40,22 @@ export function SEOFooter() {
   ];
 
   return (
-    <footer className="bg-muted/30 mt-12">
+    <footer className="border-t border-border bg-muted/30 mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Services & Related Pages */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div className="space-y-3">
             <h5 className="font-medium text-foreground">Servicios</h5>
             <ul className="text-sm text-muted-foreground space-y-2">
               {mainServices.map((service) => (
                 <li key={service.href}>
-                  <Link
+                  <a
                     href={service.href}
-                    className="flex items-center gap-2 hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 transition-colors hover:text-primary"
                   >
-                    {service.icon}
+                    <span className="text-primary">{service.icon}</span>
                     {service.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -67,13 +65,13 @@ export function SEOFooter() {
             <ul className="text-sm text-muted-foreground space-y-2">
               {relatedPages.map((page) => (
                 <li key={page.href}>
-                  <Link
+                  <a
                     href={page.href}
-                    className="flex items-center gap-2 hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 transition-colors hover:text-primary"
                   >
-                    <Globe className="w-4 h-4" />
+                    <Globe className="h-4 w-4 text-primary" aria-hidden="true" />
                     {page.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -81,7 +79,7 @@ export function SEOFooter() {
         </div>
 
         {/* Additional SEO Content */}
-        <div className="mt-12 pt-8 border-t border-border/50">
+        <div className="mt-12 pt-8 border-t border-border/60">
           <div className="text-center space-y-4">
             <div className="max-w-3xl mx-auto">
               <h4 className="font-semibold text-foreground mb-2">
@@ -92,7 +90,7 @@ export function SEOFooter() {
                 <strong>tipo de cambio dólar a quetzal guatemalteco</strong> en
                 tiempo real. Ofrecemos información actualizada de los
                 principales bancos de Guatemala, incluyendo{" "}
-                <strong>Banco de Guatemala (Banguat)</strong>,
+                <strong>Banco de Guatemala (Banguat)</strong>,{" "}
                 <strong>Banco Industrial</strong>,{" "}
                 <strong>Banco G&T Continental</strong>,{" "}
                 <strong>Banco Agrícola</strong> y más. Nuestro servicio incluye{" "}
@@ -142,11 +140,11 @@ export function SEOFooter() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-8 pt-8 border-t border-border/50">
+        <div className="mt-8 pt-8 border-t border-border/60">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>© {currentYear} DólarGT. Hecho con ❤️ en Guatemala.</span>
+              <Clock className="h-4 w-4" aria-hidden="true" />
+              <span>© {currentYear} DólarGT. Hecho en Guatemala.</span>
             </div>
             <div className="flex items-center gap-4">
               <span>Servicio de información de tipo de cambio USD/GTQ</span>

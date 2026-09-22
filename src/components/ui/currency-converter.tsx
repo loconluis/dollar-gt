@@ -1,12 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { motion } from "framer-motion";
-import { ArrowLeftRight, Calculator } from "lucide-react";
+import { ArrowLeftRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { GlassCard, GlassCardHeader, GlassCardContent } from "@/components/ui/glass-card";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  SelectItemText,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 interface ExchangeRateOption {
@@ -34,12 +39,18 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
 }) => {
   const [gtqAmount, setGtqAmount] = React.useState("");
   const [usdAmount, setUsdAmount] = React.useState("");
-  const [focusedInput, setFocusedInput] = React.useState<"gtq" | "usd" | null>(null);
-  const [internalSelectedRate, setInternalSelectedRate] = React.useState(selectedExchangeRate || exchangeRates[0]?.id || "");
+  const [focusedInput, setFocusedInput] = React.useState<"gtq" | "usd" | null>(
+    null,
+  );
+  const [internalSelectedRate, setInternalSelectedRate] = React.useState(
+    selectedExchangeRate || exchangeRates[0]?.id || "",
+  );
 
   const currentRate = selectedExchangeRate
-    ? exchangeRates.find(r => r.id === selectedExchangeRate)?.rate || exchangeRate
-    : exchangeRates.find(r => r.id === internalSelectedRate)?.rate || exchangeRate;
+    ? exchangeRates.find((r) => r.id === selectedExchangeRate)?.rate ||
+      exchangeRate
+    : exchangeRates.find((r) => r.id === internalSelectedRate)?.rate ||
+      exchangeRate;
 
   const handleGtqChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -80,174 +91,151 @@ const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
   };
 
   return (
-    <GlassCard className={className} variant="elevated">
-      <GlassCardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-primary" />
-            <h3 className="text-lg font-semibold">Conversor de Moneda</h3>
-          </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            {exchangeRates.length > 0 && (
-              <Select
-                value={selectedExchangeRate || internalSelectedRate}
-                onValueChange={handleExchangeRateChange}
-              >
-                <SelectTrigger className="w-full sm:w-[280px]">
-                  <SelectValue placeholder="Seleccionar tasa de cambio" />
-                </SelectTrigger>
-                <SelectContent>
-                  {exchangeRates.map((rate) => (
-                    <SelectItem key={rate.id} value={rate.id}>
-                      <div className="flex items-center gap-2">
-                        <span>{rate.name}</span>
-                        {rate.is_online && (
-                          <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                            Virtual
-                          </span>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            </div>
+    <div className={cn("space-y-6", className)}>
+      {/* Rate source select */}
+      {exchangeRates.length > 0 && (
+        <div className="flex justify-end">
+          <Select
+            value={selectedExchangeRate || internalSelectedRate}
+            onValueChange={handleExchangeRateChange}
+          >
+            <SelectTrigger className="w-full sm:w-[300px]">
+              <SelectValue placeholder="Seleccionar tasa de cambio" />
+            </SelectTrigger>
+            <SelectContent>
+              {exchangeRates.map((rate) => (
+                <SelectItem key={rate.id} value={rate.id}>
+                  <div className="flex items-center gap-2">
+                    <SelectItemText>{rate.name}</SelectItemText>
+                    {rate.is_online && (
+                      <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
+                        Virtual
+                      </span>
+                    )}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-      </GlassCardHeader>
-      <GlassCardContent>
-        <motion.div
-          className="space-y-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* GTQ Input */}
-          <motion.div
-            className="space-y-2"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <div className="flex items-center justify-between">
-              <Label
-                htmlFor="gtq-input"
-                className={cn(
-                  "text-sm font-medium transition-colors",
-                  focusedInput === "gtq" ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                Quetzal Guatemalteco (GTQ)
-              </Label>
-              <span className="text-xs text-muted-foreground">
-                {gtqAmount && formatNumber(gtqAmount)}
-              </span>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <span className="text-muted-foreground text-sm font-medium">Q</span>
-              </div>
-              <Input
-                id="gtq-input"
-                type="number"
-                value={gtqAmount}
-                onChange={handleGtqChange}
-                onFocus={() => setFocusedInput("gtq")}
-                onBlur={() => setFocusedInput(null)}
-                placeholder="0.00"
-                className="pl-8 text-lg font-medium bg-background/50 border-border/30 focus:border-primary/50 transition-all"
-              />
-            </div>
-          </motion.div>
+      )}
 
-          {/* Swap Button */}
-          <motion.div
-            className="flex justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={swapCurrencies}
-              className="p-2 rounded-lg bg-accent/50 hover:bg-accent transition-colors"
+      <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
+        {/* GTQ Input */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label
+              htmlFor="gtq-input"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                focusedInput === "gtq"
+                  ? "text-primary"
+                  : "text-muted-foreground",
+              )}
             >
-              <ArrowLeftRight className="w-4 h-4 text-muted-foreground" />
-            </motion.button>
-          </motion.div>
-
-          {/* USD Input */}
-          <motion.div
-            className="space-y-2"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <div className="flex items-center justify-between">
-              <Label
-                htmlFor="usd-input"
-                className={cn(
-                  "text-sm font-medium transition-colors",
-                  focusedInput === "usd" ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                Dólar Americano (USD)
-              </Label>
-              <span className="text-xs text-muted-foreground">
-                {usdAmount && formatNumber(usdAmount)}
+              Quetzal Guatemalteco (GTQ)
+            </Label>
+            <span className="font-mono text-xs text-muted-foreground tnum">
+              {gtqAmount && formatNumber(gtqAmount)}
+            </span>
+          </div>
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span className="font-mono text-sm font-medium text-muted-foreground">
+                Q
               </span>
             </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <span className="text-muted-foreground text-sm font-medium">$</span>
-              </div>
-              <Input
-                id="usd-input"
-                type="number"
-                value={usdAmount}
-                onChange={handleUsdChange}
-                onFocus={() => setFocusedInput("usd")}
-                onBlur={() => setFocusedInput(null)}
-                placeholder="0.00"
-                className="pl-8 text-lg font-medium bg-background/50 border-border/30 focus:border-primary/50 transition-all"
-              />
-            </div>
-          </motion.div>
+            <Input
+              id="gtq-input"
+              type="number"
+              inputMode="decimal"
+              value={gtqAmount}
+              onChange={handleGtqChange}
+              onFocus={() => setFocusedInput("gtq")}
+              onBlur={() => setFocusedInput(null)}
+              placeholder="0.00"
+              className="border-border bg-background pl-8 font-mono text-lg font-medium tnum transition-colors focus-visible:border-primary focus-visible:ring-primary/30"
+            />
+          </div>
+        </div>
 
-          {/* Exchange Rate Display */}
-          <motion.div
-            className="p-4 rounded-lg bg-accent/20 border border-border/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+        {/* Swap Button */}
+        <div className="flex justify-center sm:pb-2">
+          <button
+            type="button"
+            onClick={swapCurrencies}
+            aria-label="Intercambiar montos"
+            className="rounded-lg border border-border bg-muted/50 p-2.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
           >
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Tasa de Cambio</span>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">
-                  1 USD = {currentRate.toFixed(5)} GTQ
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-sm mt-1">
-              <span className="text-muted-foreground">Tasa Inversa</span>
-              <span className="font-medium">
-                1 GTQ = {(1 / currentRate).toFixed(5)} USD
+            <ArrowLeftRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        {/* USD Input */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label
+              htmlFor="usd-input"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                focusedInput === "usd"
+                  ? "text-primary"
+                  : "text-muted-foreground",
+              )}
+            >
+              Dólar Americano (USD)
+            </Label>
+            <span className="font-mono text-xs text-muted-foreground tnum">
+              {usdAmount && formatNumber(usdAmount)}
+            </span>
+          </div>
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span className="font-mono text-sm font-medium text-muted-foreground">
+                $
               </span>
             </div>
-            {exchangeRates.length > 0 && (
-              <div className="flex items-center justify-between text-sm mt-1">
-                <span className="text-muted-foreground">Fuente</span>
-                <span className="font-medium">
-                  {exchangeRates.find(r => r.id === (selectedExchangeRate || internalSelectedRate))?.name || "Desconocido"}
-                </span>
-              </div>
-            )}
-          </motion.div>
-        </motion.div>
-      </GlassCardContent>
-    </GlassCard>
+            <Input
+              id="usd-input"
+              type="number"
+              inputMode="decimal"
+              value={usdAmount}
+              onChange={handleUsdChange}
+              onFocus={() => setFocusedInput("usd")}
+              onBlur={() => setFocusedInput(null)}
+              placeholder="0.00"
+              className="border-border bg-background pl-8 font-mono text-lg font-medium tnum transition-colors focus-visible:border-primary focus-visible:ring-primary/30"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Exchange Rate Display */}
+      <div className="rounded-lg border border-border/70 bg-muted/30 p-4">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Tasa de Cambio</span>
+          <span className="font-mono font-medium tnum">
+            1 USD = {currentRate.toFixed(5)} GTQ
+          </span>
+        </div>
+        <div className="mt-1.5 flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Tasa Inversa</span>
+          <span className="font-mono font-medium tnum">
+            1 GTQ = {(1 / currentRate).toFixed(5)} USD
+          </span>
+        </div>
+        {exchangeRates.length > 0 && (
+          <div className="mt-1.5 flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Fuente</span>
+            <span className="font-medium">
+              {exchangeRates.find(
+                (r) => r.id === (selectedExchangeRate || internalSelectedRate),
+              )?.name || "Desconocido"}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

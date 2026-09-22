@@ -10,74 +10,6 @@ export function LocalSEO({ currentPrice }: LocalSEOProps) {
 
   return (
     <>
-      <link
-        rel="alternate"
-        hrefLang="es-GT"
-        href="https://dolar.luislocon.dev"
-      />
-      <link
-        rel="alternate"
-        hrefLang="es"
-        href="https://dolar.luislocon.dev"
-      />
-      <link
-        rel="alternate"
-        hrefLang="x-default"
-        href="https://dolar.luislocon.dev"
-      />
-
-      {/* Local business structured data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "@id": "https://dolar.luislocon.dev/#localbusiness",
-            name: "DólarGT - Tipo de Cambio Guatemala",
-            description: "Servicio de consulta de tipo de cambio dólar a quetzal guatemalteco en tiempo real",
-            url: "https://dolar.luislocon.dev",
-            telephone: "+502-XXXX-XXXX",
-            address: {
-              "@type": "PostalAddress",
-              addressCountry: "GT",
-              addressRegion: "Guatemala"
-            },
-            geo: {
-              "@type": "GeoCoordinates",
-              latitude: 14.6349,
-              longitude: -90.5069
-            },
-            areaServed: {
-              "@type": "Country",
-              name: "Guatemala"
-            },
-            openingHours: "Mo-Su 00:00-23:59",
-            priceRange: "$$",
-            currenciesAccepted: "GTQ, USD",
-            paymentAccepted: "Cash, Credit Card",
-            serviceType: "Currency Exchange Information",
-            hasOfferCatalog: {
-              "@type": "OfferCatalog",
-              name: "Servicios de Tipo de Cambio",
-              itemListElement: [
-                {
-                  "@type": "Offer",
-                  itemOffered: {
-                    "@type": "Service",
-                    name: "Consulta de tipo de cambio USD a GTQ",
-                    description: "Consulta en tiempo real del tipo de cambio del dólar a quetzal guatemalteco"
-                  },
-                  price: "0",
-                  priceCurrency: "GTQ",
-                  availability: "https://schema.org/InStock"
-                }
-              ]
-            }
-          }),
-        }}
-      />
-
       {/* Organization structured data */}
       <script
         type="application/ld+json"
@@ -105,11 +37,7 @@ export function LocalSEO({ currentPrice }: LocalSEOProps) {
               contactType: "Customer Service",
               areaServed: "GT",
               availableLanguage: ["Spanish"]
-            },
-            sameAs: [
-              "https://twitter.com/dollargt",
-              "https://facebook.com/dollargt"
-            ]
+            }
           }),
         }}
       />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/next";
 import localFont from "next/font/local";
+import { MotionConfigProvider } from "@/components/MotionConfigProvider";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -56,6 +57,8 @@ export const metadata: Metadata = {
     canonical: "/",
     languages: {
       "es-GT": "/",
+      es: "/",
+      "x-default": "/",
     },
   },
   openGraph: {
@@ -67,6 +70,14 @@ export const metadata: Metadata = {
     locale: "es_GT",
     type: "website",
     countryName: "Guatemala",
+    images: [
+      {
+        url: "https://dolar.luislocon.dev/og.png",
+        width: 1200,
+        height: 630,
+        alt: "DólarGT: tipo de cambio dólar a quetzal guatemalteco en tiempo real",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -75,6 +86,7 @@ export const metadata: Metadata = {
       "Consulta el tipo de cambio dólar a quetzal guatemalteco en tiempo real. Precios actualizados de bancos y gráficos históricos.",
     creator: "@dollargt",
     site: "@dollargt",
+    images: ["https://dolar.luislocon.dev/og.png"],
   },
   icons: {
     icon: "/favicon.ico",
@@ -111,11 +123,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6485530247276914"
-        crossOrigin="anonymous"
-      ></script>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -125,8 +132,10 @@ export default function RootLayout({
           enableSystem={true}
           disableTransitionOnChange={false}
         >
-          {children}
-          <Analytics />
+          <MotionConfigProvider>
+            {children}
+            <Analytics />
+          </MotionConfigProvider>
         </ThemeProvider>
       </body>
     </html>
